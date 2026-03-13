@@ -1,0 +1,9 @@
+/* Definições globais dos SVGs */
+.icon {
+  width: 24px;
+  height: 24px;
+  display: inline-block;
+  vertical-align: middle;
+  color: inherit;
+  transition: color 0.2s ease;
+}

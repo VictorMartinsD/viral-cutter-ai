@@ -1,0 +1,19 @@
+# --- Dependências ---
+node_modules/
+
+# --- Logs e Arquivos de Erro ---
+*.log
+
+# --- Arquivos Temporários de Editores (Ex: Word) ---
+~$*.docx
+
+# --- Arquivos de Sistema ---
+.DS_Store
+Thumbs.db
+
+# --- Pastas de Compilação/Build ---
+dist/
+build/
+
+# --- Rascunhos ---
+draft.html

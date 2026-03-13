@@ -1,0 +1,10 @@
+node_modules
+dist
+build
+.vscode
+assets
+*.min.css
+*.min.js
+package.json
+package-lock.json
+LICENSE

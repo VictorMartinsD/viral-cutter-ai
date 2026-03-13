@@ -1,0 +1,67 @@
+/* Modern Reset */
+
+/* 1. Define o box-sizing para facilitar o cálculo de tamanhos */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* 2. Remove margens e paddings padrão de tudo */
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* 3. Melhora a altura e o scroll do corpo */
+html,
+body {
+  height: 100%;
+}
+
+body {
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 4. Faz as imagens serem responsivas por padrão */
+img,
+picture,
+video,
+canvas,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: cover;
+}
+
+/* 5. Remove estilos de lista e links */
+ul,
+ol,
+ul[role="list"],
+ol[role="list"] {
+  list-style: none;
+}
+/* Importante: Use class: role="list" no HTML para manter a acessibilidade no Safari e garantir o reset em navegadores legados.*/
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* 6. Reseta fontes de formulários (que não herdam o body por padrão) */
+input,
+button,
+textarea,
+select {
+  font: inherit;
+}
+
+/* 7. Evita que textos fiquem muito grandes no mobile */
+html {
+  -moz-text-size-adjust: none;
+  -webkit-text-size-adjust: none;
+  text-size-adjust: none;
+}
