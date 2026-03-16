@@ -4,6 +4,13 @@
 */
 
 // 1. Variáveis Globais e Seletores de Elementos
+const el = {
+  status: document.getElementById("status"),
+  video: document.getElementById("video"),
+  apiKey: document.getElementById("apiKey"),
+  button: document.getElementById("uploadWidget"),
+};
+
 const app = {
   transcriptionURL: "",
   public_id: "",
@@ -46,7 +53,7 @@ const app = {
     const model = "gemini-3-flash-preview";
     const endpointGemini = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     const headers = {
-      "x-goog-api-key": "AIzaSyDS8CnLqFljQMfL6cqGqWNFqW1x0RfXFJU",
+      "x-goog-api-key": el.apiKey.value,
       "Content-Type": "application/json",
     };
 
@@ -131,7 +138,7 @@ const myWidget = cloudinary.createUploadWidget(config, async (error, result) => 
 
       const viralMoment = await app.getViralMoment(); //so_12.5,eo_45.2
       const viralMomentURL = `https://res.cloudinary.com/${config.cloudName}/video/upload/${viralMoment}/${app.public_id}.mp4`;
-      console.log({ viralMoment });
+      el.video.setAttribute("src", viralMomentURL);
     } catch (error) {
       console.log({ error });
     }
@@ -139,9 +146,14 @@ const myWidget = cloudinary.createUploadWidget(config, async (error, result) => 
 });
 
 // 3. Eventos (Clicks, Forms, etc)
-document.getElementById("upload_widget").addEventListener(
+el.button.addEventListener(
   "click",
   function () {
+    if (!el.apiKey.value) {
+      alert("Por favor, insira sua API do Gemini primeiro.");
+      el.apiKey.focus();
+      return;
+    }
     myWidget.open();
   },
   false,
