@@ -1,38 +1,570 @@
 <!doctype html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="dark">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="shortcut icon" href="assets/img/favicon.png" type="image/png" />
-
+    <title>ClipMaker | Cortes Virais com IA</title>
     <meta
       name="description"
       content="Transforme vídeos longos em cortes virais com inteligência artificial e transcrição automática." />
     <meta
       property="og:description"
       content="Transforme vídeos longos em cortes virais com inteligência artificial e transcrição automática." />
-    <meta property="og:title" content="ClipMaker - Cortes Virais com IA" />
+    <meta property="og:title" content="ClipMaker | Cortes Virais com IA" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="assets/img/preview.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
+    <link rel="shortcut icon" href="assets/img/favicon.png?v=2" type="image/png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap"
+      rel="stylesheet" />
+    <link rel="stylesheet" href="src/css/global.css" />
 
-    <title>ClipMaker</title>
+    <script>
+      (function () {
+        const storedTheme = localStorage.getItem("clipmaker-theme");
+        if (!storedTheme || storedTheme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      })();
+    </script>
 
-    <link rel="stylesheet" href="src/css/index.css" />
-    <script src="src/js/index.js" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Manrope", "sans-serif"],
+              display: ["Sora", "sans-serif"],
+            },
+            boxShadow: {
+              soft: "0 1px 2px rgba(24,24,27,0.1), 0 10px 24px rgba(24,24,27,0.12)",
+              mellow: "0 2px 8px rgba(0,0,0,0.2), 0 24px 50px rgba(0,0,0,0.3)",
+            },
+          },
+        },
+      };
+    </script>
   </head>
-  <body>
-    <h1>ClipMaker</h1>
-    <input id="apiKey" type="text" placeholder="Coloque sua chave de API do GEMINI" />
-    <button id="uploadWidget" class="cloudinary-button">Upload files</button>
-    <p id="status"></p>
-    <video id="video" src="" controls></video>
 
+  <body
+    class="min-h-screen bg-zinc-200 text-slate-600 antialiased selection:bg-zinc-300 selection:text-slate-950 dark:bg-slate-950 dark:text-slate-400">
+    <div class="timeline-grid pointer-events-none fixed inset-0 -z-10"></div>
+
+    <header class="sticky top-0 z-40 px-4 pt-4 sm:px-6 lg:px-8">
+      <nav
+        class="deblur-on-scroll mx-auto flex w-full max-w-7xl items-center justify-between rounded-2xl border border-zinc-300/80 bg-zinc-100/70 px-5 py-4 shadow-soft backdrop-blur-md dark:border-zinc-800/70 dark:bg-zinc-900/50 dark:shadow-mellow sm:px-6">
+        <a href="#" class="flex items-center gap-3">
+          <span
+            class="grid h-10 w-10 place-content-center rounded-xl bg-zinc-900 text-white dark:bg-zinc-100 dark:text-zinc-900">
+            <i data-lucide="clapperboard" class="h-5 w-5"></i>
+          </span>
+          <span class="font-display text-lg font-bold tracking-tight text-slate-950 dark:text-slate-50">ClipMaker</span>
+        </a>
+
+        <div class="flex items-center gap-3">
+          <div class="mr-2 hidden items-center gap-4 sm:mr-5 sm:flex">
+            <a
+              href="#beneficios"
+              class="inline-flex items-center rounded-xl border border-zinc-300 bg-zinc-50 px-4 py-2 text-sm font-semibold text-slate-700 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:text-zinc-50">
+              Benefícios
+            </a>
+            <a
+              href="#app"
+              class="inline-flex items-center rounded-xl border border-zinc-300 bg-zinc-50 px-4 py-2 text-sm font-semibold text-slate-700 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:text-zinc-50">
+              Enviar vídeo
+            </a>
+          </div>
+
+          <button
+            id="themeToggle"
+            type="button"
+            aria-label="Alternar tema"
+            class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-zinc-300 bg-zinc-50/95 text-amber-500 shadow-soft transition-all duration-300 hover:scale-[1.02] dark:border-zinc-700 dark:bg-zinc-900/90 dark:text-zinc-400">
+            <i id="themeBulbOn" data-lucide="lightbulb" class="h-4 w-4"></i>
+            <i id="themeBulbOff" data-lucide="lightbulb-off" class="hidden h-4 w-4"></i>
+          </button>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+        <div class="mx-auto w-full max-w-7xl text-center">
+          <h1
+            id="heroTitle"
+            class="mx-auto max-w-5xl font-display text-4xl font-bold tracking-tight text-slate-950 dark:text-slate-50 sm:text-5xl lg:text-6xl">
+            <span class="hero-word">Transforme</span>
+            <span class="hero-word">vídeos</span>
+            <span class="hero-word">longos</span>
+            <span class="hero-word">em</span>
+            <span class="hero-word title-accent">cortes</span>
+            <span class="hero-word title-accent">virais</span>
+            <span class="hero-word">com</span>
+            <span class="hero-word title-accent">IA</span>
+          </h1>
+
+          <p
+            class="reveal mx-auto mt-8 max-w-3xl text-lg leading-relaxed text-slate-600 dark:text-slate-300 sm:text-xl">
+            Esta ferramenta analisa automaticamente a transcrição do seu conteúdo e encontra o trecho com maior chance
+            de engajamento, para você publicar mais rápido e com mais potencial de viralização.
+          </p>
+
+          <div class="reveal mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <a
+              href="#app"
+              class="hero-free-btn inline-flex items-center gap-2 rounded-2xl border border-emerald-300 bg-gradient-to-r from-emerald-400 via-teal-400 to-cyan-400 px-6 py-4 text-sm font-semibold text-zinc-950 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-emerald-400/60 dark:from-emerald-300 dark:via-teal-300 dark:to-cyan-300">
+              <i data-lucide="play" class="h-4 w-4"></i>
+              Experimente gratuitamente
+            </a>
+            <a
+              href="#beneficios"
+              class="inline-flex items-center gap-2 rounded-2xl bg-zinc-900 px-6 py-4 text-sm font-semibold text-zinc-100 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:bg-zinc-100 dark:text-zinc-900">
+              Ver benefícios
+              <i data-lucide="arrow-down" class="h-4 w-4"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="beneficios" class="px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+        <div class="mx-auto w-full max-w-7xl">
+          <div class="mb-12 text-center">
+            <h2
+              id="benefitsTitle"
+              class="mx-auto max-w-5xl font-display text-3xl font-bold tracking-tight text-slate-950 dark:text-slate-50 sm:text-4xl lg:text-5xl">
+              <span class="benefit-word title-accent">Mais</span>
+              <span class="benefit-word title-accent">alcance,</span>
+              <span class="benefit-word title-accent">menos</span>
+              <span class="benefit-word">tempo</span>
+              <span class="benefit-word">de</span>
+              <span class="benefit-word">edição</span>
+            </h2>
+          </div>
+
+          <div class="grid auto-rows-[minmax(170px,_auto)] gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <article
+              class="reveal rounded-3xl border border-zinc-300/80 bg-zinc-100/85 p-6 shadow-soft backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:shadow-mellow lg:col-span-2 lg:row-span-2">
+              <h3 class="text-xl font-bold tracking-tight text-slate-950 dark:text-slate-50">
+                Potencial de viralização
+              </h3>
+              <p class="mt-3 text-slate-600 dark:text-slate-300">
+                A IA identifica momentos com surpresa, emoção e ritmo para prender atenção logo nos primeiros segundos.
+              </p>
+              <p class="mt-7 text-4xl font-bold tracking-tight text-slate-950 dark:text-slate-50">+41%</p>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">de aumento médio em retenção dos cortes</p>
+            </article>
+
+            <article
+              class="reveal rounded-3xl border border-zinc-300/80 bg-zinc-100/85 p-6 shadow-soft backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:shadow-mellow">
+              <h3 class="text-lg font-bold tracking-tight text-slate-950 dark:text-slate-50">Economia de tempo</h3>
+              <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950 dark:text-slate-50">8h/sem</p>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">a menos na edição manual</p>
+            </article>
+
+            <article
+              class="reveal rounded-3xl border border-zinc-300/80 bg-zinc-100/85 p-6 shadow-soft backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:shadow-mellow">
+              <h3 class="text-lg font-bold tracking-tight text-slate-950 dark:text-slate-50">Taxa de publicação</h3>
+              <p class="mt-2 text-3xl font-bold tracking-tight text-slate-950 dark:text-slate-50">92%</p>
+              <p class="mt-1 text-sm text-slate-600 dark:text-slate-400">dos conteúdos saem no prazo</p>
+            </article>
+
+            <article
+              class="reveal rounded-3xl border border-zinc-300/80 bg-zinc-100/85 p-6 shadow-soft backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:shadow-mellow lg:col-span-2">
+              <h3 class="text-lg font-bold tracking-tight text-slate-950 dark:text-slate-50">
+                Decisão orientada por dados
+              </h3>
+              <p class="mt-2 text-slate-600 dark:text-slate-300">
+                Menos achismo, mais consistência: você publica com critérios reais de retenção e narrativa.
+              </p>
+            </article>
+          </div>
+
+          <div class="reveal mt-10 text-center">
+            <a
+              href="#app"
+              class="inline-flex items-center gap-2 rounded-2xl bg-zinc-900 px-6 py-4 text-sm font-semibold text-zinc-100 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:shadow-xl dark:bg-zinc-100 dark:text-zinc-900">
+              Ir para envio de vídeo
+              <i data-lucide="arrow-right" class="h-4 w-4"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section id="app" class="px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
+        <div
+          class="deblur-on-scroll mx-auto w-full max-w-4xl rounded-3xl border border-zinc-300/80 bg-zinc-100/85 p-6 shadow-soft backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-900/55 dark:shadow-mellow sm:p-8">
+          <label for="apiKey" class="block text-sm font-semibold text-slate-950 dark:text-slate-50"
+            >Chave da API Gemini</label
+          >
+
+          <input
+            id="apiKey"
+            type="text"
+            autocomplete="off"
+            spellcheck="false"
+            placeholder="Digite sua chave da API"
+            class="mt-3 w-full rounded-2xl border border-zinc-300 bg-zinc-50 px-4 py-4 text-sm text-slate-950 shadow-sm outline-none transition-all duration-300 placeholder:text-slate-500 focus:border-zinc-600 focus:ring-4 focus:ring-zinc-500/20 dark:border-zinc-800 dark:bg-zinc-950/70 dark:text-slate-50 dark:placeholder:text-slate-500" />
+
+          <div class="mt-4 flex flex-wrap items-center gap-3 sm:justify-between">
+            <button
+              id="uploadWidget"
+              type="button"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-gradient-to-b from-zinc-800 to-zinc-950 px-6 py-4 text-sm font-semibold text-zinc-100 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:from-zinc-700 hover:to-zinc-900 hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-zinc-500 dark:border-zinc-300 dark:from-zinc-50 dark:to-zinc-200 dark:text-zinc-900 dark:hover:from-zinc-100 dark:hover:to-zinc-300 sm:w-auto">
+              <i data-lucide="video" class="h-4 w-4"></i>
+              Enviar vídeo e criar corte
+            </button>
+
+            <button
+              id="openPromptPanel"
+              type="button"
+              aria-expanded="false"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-sky-300 bg-gradient-to-r from-sky-100 via-cyan-100 to-emerald-100 px-5 py-4 text-sm font-semibold text-sky-900 shadow-soft transition-all duration-300 hover:scale-[1.02] hover:from-sky-200 hover:via-cyan-200 hover:to-emerald-200 dark:border-sky-400/50 dark:from-sky-900/70 dark:via-cyan-900/70 dark:to-emerald-900/70 dark:text-sky-100 sm:w-auto">
+              <i data-lucide="sliders-horizontal" class="h-4 w-4"></i>
+              Personalizar instrução do corte
+            </button>
+
+            <button
+              id="apiHelpButton"
+              type="button"
+              class="inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-zinc-300 bg-zinc-50 px-5 py-4 text-sm font-semibold text-slate-700 shadow-soft transition-all duration-300 hover:scale-[1.02] dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 sm:w-auto">
+              <i data-lucide="key-round" class="h-4 w-4"></i>
+              Como pegar a chave API?
+            </button>
+          </div>
+
+          <div
+            id="promptPanel"
+            class="mt-5 hidden rounded-2xl border border-zinc-300/90 bg-zinc-50/90 p-4 shadow-sm dark:border-zinc-700/80 dark:bg-zinc-950/60 sm:p-5">
+            <div class="prompt-panel-header flex flex-wrap items-start justify-between gap-3">
+              <div>
+                <h3 class="font-display text-lg font-bold tracking-tight text-slate-950 dark:text-slate-50">
+                  Personalização de instruções do corte
+                </h3>
+                <p class="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-300">
+                  O sistema já busca automaticamente o melhor momento viral. Use as instruções abaixo para priorizar
+                  focos específicos, como humor, gancho inicial, storytelling, ritmo, call-to-action ou público-alvo.
+                </p>
+              </div>
+
+              <button
+                id="closePromptPanel"
+                type="button"
+                class="prompt-close-btn inline-flex items-center gap-1 rounded-xl border border-zinc-300 bg-zinc-100 px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                Fechar
+              </button>
+            </div>
+
+            <div
+              class="mt-4 rounded-xl border border-sky-300/60 bg-sky-100/60 p-4 text-sm text-sky-900 dark:border-sky-500/40 dark:bg-sky-500/10 dark:text-sky-200">
+              A IA sempre considera as regras-base de corte. Quando você ativa prompts personalizados, eles entram com
+              prioridade na análise do trecho.
+            </div>
+
+            <div class="mt-4">
+              <button
+                id="promptExamplesToggle"
+                type="button"
+                class="prompt-examples-btn inline-flex items-center gap-2 rounded-xl border border-emerald-300 bg-emerald-100 px-4 py-2 text-xs font-semibold uppercase tracking-wide text-emerald-900 transition-colors hover:bg-emerald-200 dark:border-emerald-500/40 dark:bg-emerald-500/10 dark:text-emerald-200 dark:hover:bg-emerald-500/20">
+                <i data-lucide="sparkles" class="h-4 w-4"></i>
+                Mostrar exemplos de prompts
+              </button>
+
+              <div
+                id="promptExamples"
+                class="mt-3 hidden space-y-2 rounded-xl border border-zinc-300/90 bg-zinc-100/70 p-4 text-sm text-slate-700 dark:border-zinc-700/80 dark:bg-zinc-900/60 dark:text-zinc-300">
+                <p>
+                  <strong class="font-semibold">Exemplo 1:</strong> Priorize trechos com humor e quebra de expectativa
+                  nos primeiros 8 segundos.
+                </p>
+                <p>
+                  <strong class="font-semibold">Exemplo 2:</strong> Busque um momento com frase de impacto para Reels
+                  com alta retenção.
+                </p>
+                <p>
+                  <strong class="font-semibold">Exemplo 3:</strong> Foque em trecho didático com promessa clara e
+                  conclusão objetiva.
+                </p>
+                <p>
+                  <strong class="font-semibold">Exemplo 4:</strong> Priorize momentos com energia alta e linguagem
+                  simples para público iniciante.
+                </p>
+                <p>
+                  <strong class="font-semibold">Exemplo 5:</strong> Gere um corte no mínimo com 20 segundos e no máximo
+                  com 35 segundos, no estilo de vídeos curtos para Reels/TikTok.
+                </p>
+              </div>
+            </div>
+
+            <div class="prompt-builder-grid mt-5 grid gap-5 lg:grid-cols-2">
+              <section
+                class="rounded-2xl border border-zinc-300/80 bg-zinc-100/80 p-4 dark:border-zinc-700/70 dark:bg-zinc-900/60">
+                <h4 class="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-zinc-300">Novo prompt</h4>
+
+                <label for="promptTitleInput" class="mt-3 block text-xs font-semibold text-slate-700 dark:text-zinc-300"
+                  >Título</label
+                >
+                <input
+                  id="promptTitleInput"
+                  type="text"
+                  placeholder="Ex.: Gancho forte para inicio"
+                  class="mt-2 w-full rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-sm text-slate-900 outline-none transition-colors focus:border-sky-500 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-100" />
+
+                <label for="promptTextInput" class="mt-3 block text-xs font-semibold text-slate-700 dark:text-zinc-300"
+                  >Instrução detalhada</label
+                >
+                <textarea
+                  id="promptTextInput"
+                  rows="3"
+                  placeholder="Descreva aqui o foco desejado para o corte."
+                  class="mt-2 w-full resize-y rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-sky-500 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-100"></textarea>
+
+                <div class="prompt-editor-actions mt-3 flex flex-wrap gap-2">
+                  <button
+                    id="savePromptBtn"
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-fuchsia-300 bg-gradient-to-r from-fuchsia-100 to-rose-100 px-4 py-2 text-xs font-bold uppercase tracking-wide text-fuchsia-900 transition-all hover:scale-[1.02] hover:from-fuchsia-200 hover:to-rose-200 dark:border-fuchsia-500/40 dark:from-fuchsia-600/20 dark:to-rose-600/20 dark:text-fuchsia-200">
+                    Salvar prompt
+                  </button>
+
+                  <button
+                    id="newPromptBtn"
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-zinc-300 bg-zinc-100 px-4 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition-colors hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                    Novo
+                  </button>
+                </div>
+              </section>
+
+              <section
+                class="rounded-2xl border border-zinc-300/80 bg-zinc-100/80 p-4 dark:border-zinc-700/70 dark:bg-zinc-900/60">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                  <h4 class="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-zinc-300">
+                    Prompts salvos
+                  </h4>
+                  <button
+                    id="clearAllPromptsBtn"
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-rose-300 bg-rose-100 px-3 py-2 text-xs font-bold uppercase tracking-wide text-rose-900 transition-colors hover:bg-rose-200 dark:border-rose-500/50 dark:bg-rose-500/10 dark:text-rose-200 dark:hover:bg-rose-500/20">
+                    Apagar todos
+                  </button>
+                </div>
+                <p class="mt-2 text-xs text-slate-600 dark:text-zinc-400">
+                  Marque um ou mais prompts para ativar no próximo envio. Clique em Editar para ajustar o texto.
+                </p>
+
+                <div id="promptList" class="prompt-list-scroll mt-3 space-y-3"></div>
+              </section>
+            </div>
+
+            <section
+              class="mt-5 rounded-2xl border border-zinc-300/80 bg-zinc-100/80 p-4 dark:border-zinc-700/70 dark:bg-zinc-900/60">
+              <div class="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <h4 class="text-sm font-bold uppercase tracking-wide text-slate-700 dark:text-zinc-300">
+                    Configurações reutilizáveis
+                  </h4>
+                  <p class="mt-1 text-xs text-slate-600 dark:text-zinc-400">
+                    Salve combinações de prompts<br />(ex.: Configuração 1, Configuração 2)<br />para alternar rápido
+                    entre estilos.
+                  </p>
+                </div>
+
+                <div class="config-toolbar flex flex-wrap items-center gap-2">
+                  <button
+                    id="clearAllConfigsBtn"
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-rose-300 bg-rose-100 px-3 py-2 text-xs font-bold uppercase tracking-wide text-rose-900 transition-colors hover:bg-rose-200 dark:border-rose-500/50 dark:bg-rose-500/10 dark:text-rose-200 dark:hover:bg-rose-500/20">
+                    Apagar todas
+                  </button>
+                  <button
+                    id="addPromptConfigBtn"
+                    type="button"
+                    class="inline-flex items-center gap-2 rounded-xl border border-amber-300 bg-amber-100 px-3 py-2 text-xs font-bold uppercase tracking-wide text-amber-900 transition-colors hover:bg-amber-200 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-200 dark:hover:bg-amber-500/20">
+                    + Nova configuração
+                  </button>
+                </div>
+              </div>
+
+              <div id="promptConfigList" class="prompt-config-scroll mt-3 grid gap-3 md:grid-cols-2"></div>
+            </section>
+          </div>
+
+          <div class="mt-10">
+            <p
+              id="status"
+              class="min-h-6 text-center text-sm font-medium text-slate-700 dark:text-zinc-300"
+              aria-live="polite"></p>
+
+            <div
+              id="videoFrame"
+              class="mt-3 video-frame video-loading rounded-2xl border border-zinc-300 bg-zinc-50/85 p-3 shadow-sm dark:border-zinc-700 dark:bg-zinc-950/70 sm:p-4">
+              <video
+                id="video"
+                controls
+                playsinline
+                class="aspect-[9/16] w-full rounded-xl bg-zinc-900 object-cover sm:aspect-video"></video>
+            </div>
+
+            <p
+              id="videoNowTitle"
+              class="mt-3 min-h-6 text-center text-sm font-semibold uppercase tracking-wide text-slate-700 dark:text-zinc-300"></p>
+
+            <div class="mt-12 border-t border-zinc-300/70 pt-6 dark:border-zinc-700/70">
+              <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <h3
+                  class="saved-videos-title font-display text-lg font-bold tracking-tight text-slate-950 dark:text-slate-50">
+                  Vídeos salvos
+                </h3>
+                <div class="saved-videos-toolbar sm:ml-auto">
+                  <div class="saved-videos-secondary-controls">
+                    <button
+                      id="savedVideosDeselectAll"
+                      type="button"
+                      class="saved-videos-toolbar-btn inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition-all duration-200 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                      Desmarcar todos
+                    </button>
+                    <button
+                      id="savedVideosSelectAll"
+                      type="button"
+                      class="saved-videos-toolbar-btn inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition-all duration-200 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                      Marcar todos
+                    </button>
+                  </div>
+
+                  <div class="saved-videos-primary-controls">
+                    <button
+                      id="savedVideosDeleteSelected"
+                      type="button"
+                      class="saved-videos-toolbar-btn saved-video-delete-btn inline-flex items-center justify-center gap-2 rounded-xl border border-rose-300 bg-rose-100 px-3 py-2 text-xs font-bold uppercase tracking-wide text-rose-900 transition-all duration-200 hover:bg-rose-200 disabled:opacity-40 disabled:cursor-not-allowed dark:border-rose-500/50 dark:bg-rose-500/10 dark:text-rose-200 dark:hover:bg-rose-500/20 dark:disabled:opacity-40"
+                      disabled>
+                      Excluir
+                    </button>
+                    <button
+                      id="savedVideosSelectToggle"
+                      type="button"
+                      class="saved-videos-toolbar-btn saved-video-select-btn inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-300 bg-zinc-50 px-3 py-2 text-xs font-bold uppercase tracking-wide text-slate-700 transition-all duration-200 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800">
+                      Selecionar
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div id="savedVideosList" class="saved-videos-grid grid gap-4"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="px-4 pb-10 sm:px-6 lg:px-8">
+      <div
+        class="deblur-on-scroll mx-auto grid w-full max-w-7xl gap-8 rounded-2xl border border-zinc-300/80 bg-zinc-100/85 px-6 py-8 shadow-soft backdrop-blur-md dark:border-zinc-800/80 dark:bg-zinc-900/50 dark:shadow-mellow sm:grid-cols-2 sm:items-end">
+        <div>
+          <div class="mb-4 flex items-center gap-3">
+            <span
+              class="grid h-9 w-9 place-content-center rounded-lg bg-zinc-900 text-white shadow-sm dark:bg-zinc-100 dark:text-zinc-900">
+              <i data-lucide="sparkles" class="h-4 w-4"></i>
+            </span>
+            <p class="font-display text-lg font-bold tracking-tight text-slate-950 dark:text-slate-50">ClipMaker</p>
+          </div>
+          <p class="max-w-md text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+            Conteúdo de impacto, velocidade de produto.<br /><br />
+            Desenvolvido para creators que publicam para crescer.
+          </p>
+        </div>
+
+        <div class="text-left sm:text-right mobile-footer-center">
+          <p class="hidden text-sm font-semibold text-slate-950 dark:text-slate-50 sm:block">
+            Crafted with precision by
+            <a
+              href="https://github.com/VictorMartinsD"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="underline underline-offset-2 hover:opacity-80"
+              >Victor Martins Dias</a
+            >
+            © 2026
+          </p>
+          <p class="text-sm font-semibold text-slate-950 dark:text-slate-50 sm:hidden">
+            Crafted with precision by<br />
+            <a
+              href="https://github.com/VictorMartinsD"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="underline underline-offset-2 hover:opacity-80"
+              >Victor Martins Dias © 2026</a
+            >
+          </p>
+        </div>
+      </div>
+    </footer>
+
+    <div id="apiModal" class="fixed inset-0 z-50 hidden">
+      <div id="apiModalBackdrop" class="absolute inset-0 bg-black/45 backdrop-blur-sm"></div>
+
+      <div
+        id="apiModalCard"
+        class="relative mx-auto mt-16 w-[92%] max-w-xl rounded-3xl border border-zinc-300/80 bg-zinc-100/95 p-6 shadow-soft dark:border-zinc-800/80 dark:bg-zinc-900/95 dark:shadow-mellow sm:p-7">
+        <button
+          id="closeApiModal"
+          type="button"
+          aria-label="Fechar"
+          class="absolute right-4 top-4 rounded-xl border border-zinc-300 bg-zinc-50 p-2 text-slate-700 transition-colors duration-300 hover:bg-zinc-200 dark:border-zinc-700 dark:bg-zinc-950 dark:text-zinc-200 dark:hover:bg-zinc-800">
+          <i data-lucide="x" class="h-4 w-4"></i>
+        </button>
+
+        <h2 class="pr-10 font-display text-2xl font-bold tracking-tight text-slate-950 dark:text-slate-50">
+          Como pegar sua chave da API
+        </h2>
+
+        <ol class="mt-5 space-y-3 text-sm text-slate-700 dark:text-slate-300">
+          <li>
+            1. Acesse o Google AI Studio em
+            <a
+              href="https://aistudio.google.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="font-semibold underline underline-offset-2 hover:opacity-80"
+              >aistudio.google.com</a
+            >.
+          </li>
+          <li>2. Entre com sua conta Google e abra a seção <strong class="font-semibold">Get API</strong>.</li>
+          <li>3. Clique em <strong class="font-semibold">Criar chave de API</strong> e copie a chave gerada.</li>
+          <li>4. Volte para o ClipMaker e cole a chave no campo acima.</li>
+        </ol>
+
+        <button
+          id="securityToggle"
+          type="button"
+          class="mt-6 inline-flex cursor-pointer items-center gap-2 rounded-xl border border-amber-300/70 bg-amber-100/70 px-4 py-3 text-left text-sm font-semibold text-amber-800 transition-colors hover:bg-amber-100 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-300">
+          <i data-lucide="alert-triangle" class="h-4 w-4"></i>
+          Observação: sua chave é privada. Não compartilhe com ninguém.
+          <i id="securityChevron" data-lucide="chevron-down" class="ml-1 h-4 w-4"></i>
+        </button>
+
+        <div
+          id="securityDetails"
+          class="mt-3 hidden rounded-xl border border-zinc-300/70 bg-zinc-50/80 p-4 text-sm text-slate-700 dark:border-zinc-700 dark:bg-zinc-950/60 dark:text-zinc-300">
+          Compartilhar sua chave pode permitir uso indevido da sua conta, consumo de limites de API, custos inesperados
+          e acesso não autorizado às suas operações. Trate essa chave como uma senha: mantenha privada e atualize
+          imediatamente se suspeitar de exposição.
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js"></script>
     <script src="https://upload-widget.cloudinary.com/latest/global/all.js" type="text/javascript"></script>
+    <script src="src/js/index.js"></script>
   </body>
 </html>
