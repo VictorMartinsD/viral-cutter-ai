@@ -191,7 +191,7 @@ const truncateVideoTitle = (text) => {
   const trimmed = String(text || "")
     .replace(/\s+/g, " ")
     .trim();
-  const maxLength = isMobileViewport() ? 5 : 11;
+  const maxLength = clamp(Math.floor((window.innerWidth - 92) / 7.1), 18, 52);
   if (trimmed.length > maxLength) {
     return trimmed.substring(0, maxLength) + "...";
   }
@@ -202,7 +202,7 @@ const truncatePlayerVideoTitle = (text) => {
   const trimmed = String(text || "")
     .replace(/\s+/g, " ")
     .trim();
-  const maxLength = isMobileViewport() ? 22 : 44;
+  const maxLength = clamp(Math.floor((window.innerWidth - 72) / 6.9), 34, 110);
   if (trimmed.length > maxLength) {
     return trimmed.substring(0, maxLength) + "...";
   }
@@ -314,6 +314,14 @@ const updatePromptInputLimits = () => {
   if (el.promptTextInput.value.length > textMaxLength) {
     el.promptTextInput.value = el.promptTextInput.value.slice(0, textMaxLength);
   }
+};
+
+const updatePromptTitlePlaceholder = () => {
+  if (!el.promptTitleInput) {
+    return;
+  }
+
+  el.promptTitleInput.placeholder = window.innerWidth < 355 ? "Ex.: Gancho forte..." : "Ex.: Gancho forte para inicio";
 };
 
 const animateButtonPress = (buttonElement) => {
@@ -506,7 +514,7 @@ const renderPromptList = () => {
       <article class="prompt-item ${prompt.active ? "is-active" : ""}" data-prompt-id="${escapeHTML(prompt.id)}">
         ${prompt.active ? '<span class="prompt-active-badge">✓</span>' : ""}
         <div class="prompt-item-header">
-          <span class="prompt-item-title" data-prompt-rename-id="${escapeHTML(prompt.id)}" title="${escapeHTML(prompt.title)}">${escapeHTML(truncateSavedPromptTitle(prompt.title))}</span>
+          <span class="prompt-item-title" data-prompt-rename-id="${escapeHTML(prompt.id)}" title="${escapeHTML(prompt.title)}">${escapeHTML(prompt.title)}</span>
         </div>
 
         <p class="prompt-snippet" title="${escapeHTML(prompt.text)}">${escapeHTML(truncateText(prompt.text))}</p>
@@ -545,7 +553,7 @@ const renderConfigList = () => {
       return `
         <article class="config-card ${isCurrent ? "is-active" : ""}" data-config-id="${escapeHTML(cfg.id)}">
           ${isCurrent ? '<span class="config-active-badge">✓</span>' : ""}
-          <div class="config-title config-title-editable" data-config-edit-inline="${escapeHTML(cfg.id)}" title="${escapeHTML(cfg.name)}">${escapeHTML(truncatePromptTitle(cfg.name))}</div>
+          <div class="config-title config-title-editable" data-config-edit-inline="${escapeHTML(cfg.id)}" title="${escapeHTML(cfg.name)}">${escapeHTML(cfg.name)}</div>
           <p class="config-subtitle" title="${escapeHTML(promptTitles.join("\n") || "Sem prompts nesta configuração")}">${escapeHTML(subtitleText)}</p>
 
           <div class="prompt-actions">
@@ -562,6 +570,7 @@ const renderConfigList = () => {
 const renderPromptUI = () => {
   renderPromptList();
   renderConfigList();
+  el.clearAllPromptsBtn.disabled = app.prompts.length === 0;
 };
 
 const loadSavedVideos = () => {
@@ -626,7 +635,7 @@ const renderSavedVideos = () => {
           ${video.isNew ? '<div class="saved-video-new-badge">NOVO</div>' : ""}
           ${app.isVideoSelectionMode ? '<div class="saved-video-checkbox"></div>' : ""}
         </div>
-        <p class="saved-video-title" title="${escapeHTML(video.name)}" data-video-title-id="${escapeHTML(video.id)}">${escapeHTML(truncateVideoTitle(video.name))}</p>
+        <p class="saved-video-title" title="${escapeHTML(video.name)}" data-video-title-id="${escapeHTML(video.id)}">${escapeHTML(video.name)}</p>
       </div>`,
     )
     .join("");
@@ -651,6 +660,10 @@ const playSavedVideo = (videoId) => {
     () => {
       setVideoFrameLoading(false);
       app.currentVideoId = targetVideo.id;
+      if (targetVideo.isNew) {
+        targetVideo.isNew = false;
+        saveSavedVideos();
+      }
       const label = targetVideo.name;
       setCurrentVideoTitle(label);
       renderSavedVideos();
@@ -1036,20 +1049,11 @@ const processWidgetResult = async (error, result) => {
           isNew: true,
         };
 
+        app.savedVideos = app.savedVideos.map((video) => ({ ...video, isNew: false }));
         app.savedVideos.unshift(newVideo);
         app.currentVideoId = newVideo.id;
         saveSavedVideos();
         renderSavedVideos();
-
-        // Remove "new" badge after 5 seconds
-        setTimeout(() => {
-          const savedVideo = app.savedVideos.find((v) => v.id === newVideo.id);
-          if (savedVideo) {
-            savedVideo.isNew = false;
-            saveSavedVideos();
-            renderSavedVideos();
-          }
-        }, 5000);
       },
       { once: true },
     );
@@ -1082,6 +1086,7 @@ renderPromptUI();
 renderSavedVideos();
 clearPromptEditor();
 updatePromptInputLimits();
+updatePromptTitlePlaceholder();
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
 
 gsap.fromTo(
@@ -1567,7 +1572,14 @@ el.apiHelpButton.addEventListener("click", () => {
   animateButtonPress(el.apiHelpButton);
 });
 
-window.addEventListener("resize", updatePromptInputLimits, { passive: true });
+window.addEventListener(
+  "resize",
+  () => {
+    updatePromptInputLimits();
+    updatePromptTitlePlaceholder();
+  },
+  { passive: true },
+);
 window.addEventListener(
   "resize",
   () => {

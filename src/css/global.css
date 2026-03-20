@@ -56,6 +56,9 @@ html.dark .title-accent {
 }
 
 #videoNowTitle {
+  display: block;
+  width: 100%;
+  max-width: 100%;
   min-height: 1.6rem;
   white-space: nowrap;
   overflow: hidden;
@@ -397,12 +400,15 @@ html.dark .prompt-item.is-active {
   color: #334155;
   min-width: 0;
   flex: 1;
+  height: 2rem;
   min-height: 2rem;
-  display: flex;
-  align-items: center;
+  max-height: 2rem;
+  display: block;
+  line-height: 2rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-sizing: border-box;
 }
 
 html.dark .prompt-item-title {
@@ -438,6 +444,7 @@ html.dark .prompt-snippet {
   display: flex;
   gap: 0.4rem;
   flex-wrap: wrap;
+  min-width: 0;
 }
 
 .prompt-chip-btn {
@@ -451,11 +458,46 @@ html.dark .prompt-snippet {
   color: #334155;
   background: #f8fafc;
   transition: all 0.2s ease;
-  width: 7.4rem;
-  min-width: 7.4rem;
+  width: min(7.4rem, 100%);
+  min-width: 0;
   max-width: 7.4rem;
-  flex: 0 0 7.4rem;
+  flex: 1 1 7.4rem;
   text-align: center;
+}
+
+.prompt-builder-grid > section {
+  min-width: 0;
+}
+
+#clearAllPromptsBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .prompt-item .prompt-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-toggle-id] {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-edit-id] {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-delete-id] {
+    grid-column: 1 / 3;
+    justify-self: center;
+    width: 7.4rem;
+    max-width: 7.4rem;
+  }
 }
 
 .prompt-chip-btn:disabled {
@@ -499,6 +541,8 @@ html.dark .prompt-chip-btn:hover {
   padding: 0.8rem;
   background: rgba(255, 255, 255, 0.55);
   position: relative;
+  min-width: 0;
+  overflow-x: hidden;
   transition:
     background 0.25s ease,
     box-shadow 0.25s ease,
@@ -525,11 +569,21 @@ html.dark .config-title {
 .config-title-editable {
   cursor: pointer;
   padding: 0.25rem 0.5rem;
+  padding-right: 1.7rem;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  height: 2rem;
   min-height: 2rem;
-  display: flex;
-  align-items: center;
+  max-height: 2rem;
+  display: block;
+  line-height: 1.5rem;
   border-radius: 0.5rem;
   transition: background 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
 }
 
 .config-title-editable:hover {
@@ -553,9 +607,16 @@ html.dark .config-title-editable:hover {
   padding: 0.35rem 0.5rem;
   min-height: 2rem;
   height: 2rem;
+  max-height: 2rem;
   width: 100%;
+  max-width: 100%;
   outline: none;
   transition: border-color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  margin: 0;
 }
 
 .prompt-title-input:focus,
@@ -744,6 +805,7 @@ html.dark .cloudinary-widget [class*="primary"]:hover {
   position: relative;
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -896,14 +958,19 @@ html.dark .saved-video-close-btn {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   cursor: pointer;
   padding: 0.25rem 0.4rem;
   border-radius: 0.4rem;
-  height: 2.05rem;
-  min-height: 2.05rem;
-  display: flex;
-  align-items: center;
+  height: 2.2rem;
+  min-height: 2.2rem;
+  max-height: 2.2rem;
+  display: block;
+  line-height: 1.7rem;
   transition: background 0.2s ease;
+  box-sizing: border-box;
 }
 
 .saved-video-title:hover {
@@ -929,9 +996,18 @@ html.dark .saved-video-title:hover {
   border-radius: 0.4rem;
   padding: 0.25rem 0.4rem;
   width: 100%;
-  min-height: 2.05rem;
-  height: 2.05rem;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 2.2rem;
+  height: 2.2rem;
+  max-height: 2.2rem;
   outline: none;
+  box-sizing: border-box;
+  display: block;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 html.dark .saved-video-title-input {
@@ -987,7 +1063,8 @@ html.dark .saved-videos-grid::-webkit-scrollbar-thumb:hover {
 .saved-video-new-badge {
   position: absolute;
   top: 0.5rem;
-  right: 0.5rem;
+  left: 0.5rem;
+  right: auto;
   background: #10b981;
   color: #f0fdf4;
   padding: 0.25rem 0.5rem;
@@ -997,13 +1074,13 @@ html.dark .saved-videos-grid::-webkit-scrollbar-thumb:hover {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   z-index: 10;
-  animation: slideInRight 0.3s ease;
+  animation: slideInLeft 0.3s ease;
 }
 
-@keyframes slideInRight {
+@keyframes slideInLeft {
   from {
     opacity: 0;
-    transform: translateX(20px);
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
@@ -1070,6 +1147,12 @@ html.dark .saved-video-select-btn.active {
 }
 
 @media (max-width: 767px) {
+  .prompt-config-scroll,
+  #promptConfigList,
+  .config-card {
+    overflow-x: hidden;
+  }
+
   .prompt-panel-header {
     flex-direction: column;
     align-items: stretch;
@@ -1087,8 +1170,15 @@ html.dark .saved-video-select-btn.active {
     justify-content: center;
   }
 
+  #clearAllPromptsBtn {
+    width: auto;
+    max-width: 100%;
+    align-self: flex-start;
+  }
+
   .prompt-editor-actions {
     justify-content: space-between;
+    width: 100%;
   }
 
   #savePromptBtn {
@@ -1100,24 +1190,27 @@ html.dark .saved-video-select-btn.active {
   }
 
   .prompt-item .prompt-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
     gap: 0.5rem;
   }
 
-  .prompt-item .prompt-actions [data-prompt-toggle-id] {
-    grid-column: 1;
-    justify-self: start;
-  }
-
-  .prompt-item .prompt-actions [data-prompt-edit-id] {
-    grid-column: 2;
-    justify-self: end;
+  .prompt-item .prompt-actions [data-prompt-toggle-id],
+  .prompt-item .prompt-actions [data-prompt-edit-id],
+  .prompt-item .prompt-actions [data-prompt-delete-id] {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    flex: 0 1 auto;
+    min-height: 2rem;
+    padding: 0.45rem 0.72rem;
+    line-height: 1;
   }
 
   .prompt-item .prompt-actions [data-prompt-delete-id] {
-    grid-column: 1 / 3;
-    justify-self: center;
     border-color: rgba(253, 164, 175, 0.8);
     background: rgba(255, 228, 230, 0.9);
     color: #881337;
@@ -1142,15 +1235,26 @@ html.dark .saved-video-select-btn.active {
   }
 
   .config-card .prompt-actions {
-    justify-content: space-between;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
   }
 
   .config-card .prompt-actions [data-config-toggle-id],
   .config-card .prompt-actions [data-config-delete-id] {
-    width: 48%;
-    min-width: 48%;
-    max-width: 48%;
-    flex-basis: 48%;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex-basis: auto;
+  }
+
+  .config-card .prompt-actions [data-config-delete-id] {
+    order: 2;
+  }
+
+  .config-card .prompt-actions [data-config-toggle-id] {
+    order: 1;
   }
 
   .config-card .prompt-actions [data-config-delete-id] {
@@ -1222,10 +1326,209 @@ html.dark .saved-video-select-btn.active {
 
   .saved-video-title-input {
     font-size: 0.75rem;
+    min-height: 2.2rem;
+    height: 2.2rem;
   }
 
   #videoNowTitle {
     font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 425px) {
+  .prompt-builder-grid {
+    gap: 0.75rem;
+  }
+
+  .prompt-builder-grid > section,
+  #promptPanel {
+    overflow-x: hidden;
+  }
+
+  .prompt-builder-grid section:nth-child(2) > div:first-child {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  label[for="apiKey"],
+  .prompt-builder-grid h4,
+  #promptPanel > section > div > div > h4 {
+    width: 100%;
+    text-align: center;
+  }
+
+  #promptPanel > section > div > div {
+    width: 100%;
+  }
+
+  #clearAllPromptsBtn {
+    order: 2;
+    width: 100%;
+    justify-content: center;
+  }
+
+  .prompt-editor-actions {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  #savePromptBtn,
+  #newPromptBtn {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    justify-content: center;
+  }
+
+  .saved-video-title-input {
+    font-size: 16px;
+  }
+}
+
+@media (max-width: 468px) {
+  .prompt-snippet {
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    -webkit-line-clamp: unset;
+    line-clamp: unset;
+    -webkit-box-orient: initial;
+  }
+}
+
+@media (max-width: 430px) {
+  .prompt-item .prompt-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-toggle-id],
+  .prompt-item .prompt-actions [data-prompt-edit-id],
+  .prompt-item .prompt-actions [data-prompt-delete-id] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex: 1 1 auto;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-toggle-id] {
+    order: 1;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-edit-id] {
+    order: 2;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-delete-id] {
+    order: 3;
+  }
+}
+
+@media (min-width: 431px) and (max-width: 438px) {
+  .prompt-item .prompt-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-toggle-id],
+  .prompt-item .prompt-actions [data-prompt-edit-id],
+  .prompt-item .prompt-actions [data-prompt-delete-id] {
+    width: auto;
+    min-width: 0;
+    max-width: none;
+    flex: initial;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-toggle-id] {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-edit-id] {
+    grid-column: 2;
+    justify-self: end;
+  }
+
+  .prompt-item .prompt-actions [data-prompt-delete-id] {
+    grid-column: 1 / 3;
+    justify-self: center;
+  }
+}
+
+@media (max-width: 525px) {
+  .prompt-config-scroll,
+  #promptConfigList,
+  .config-card {
+    overflow-x: hidden;
+  }
+
+  .config-card .prompt-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .config-card .prompt-actions [data-config-toggle-id],
+  .config-card .prompt-actions [data-config-delete-id] {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex-basis: auto;
+  }
+
+  .config-card .prompt-actions [data-config-delete-id] {
+    order: 2;
+  }
+
+  .config-card .prompt-actions [data-config-toggle-id] {
+    order: 1;
+  }
+}
+
+@media (max-width: 359px) {
+  #promptPanel,
+  .prompt-builder-grid,
+  .prompt-builder-grid > section,
+  .prompt-config-scroll,
+  .config-card {
+    overflow-x: hidden;
+  }
+
+  .config-card .prompt-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .config-card .prompt-actions [data-config-toggle-id],
+  .config-card .prompt-actions [data-config-delete-id] {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+    flex-basis: auto;
+  }
+
+  .config-card .prompt-actions [data-config-delete-id] {
+    order: 2;
+  }
+
+  .config-card .prompt-actions [data-config-toggle-id] {
+    order: 1;
+  }
+}
+
+@media (max-width: 375px) {
+  .prompt-builder-grid h4,
+  #promptPanel section > div > div > h4 {
+    text-align: center;
+    width: 100%;
   }
 }
 
