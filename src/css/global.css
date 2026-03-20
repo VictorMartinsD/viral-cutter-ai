@@ -542,7 +542,7 @@ html.dark .prompt-chip-btn:hover {
   background: rgba(255, 255, 255, 0.55);
   position: relative;
   min-width: 0;
-  overflow-x: hidden;
+  overflow: hidden;
   transition:
     background 0.25s ease,
     box-shadow 0.25s ease,
@@ -711,6 +711,12 @@ html.dark .config-card.is-active {
   .prompt-config-scroll {
     height: 20.3rem;
     max-height: 20.3rem;
+  }
+
+  #promptConfigList {
+    align-content: start;
+    align-items: start;
+    grid-auto-rows: max-content;
   }
 }
 
