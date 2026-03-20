@@ -1077,6 +1077,33 @@ const openWidget = () => {
   app.widget.open();
 };
 
+const initMeshBackgroundAnimation = () => {
+  const meshSpots = gsap.utils.toArray(".mesh-spot");
+  if (!meshSpots.length || window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    return;
+  }
+
+  meshSpots.forEach((spot) => {
+    gsap.set(spot, {
+      transformOrigin: "50% 50%",
+      opacity: el.root.classList.contains("dark") ? 0.03 : gsap.utils.random(0.1, 0.18),
+      "--mesh-blur": el.root.classList.contains("dark") ? "100px" : "60px",
+    });
+    gsap.to(spot, {
+      x: () => gsap.utils.random(-300, 300),
+      y: () => gsap.utils.random(-300, 300),
+      scale: () => (el.root.classList.contains("dark") ? gsap.utils.random(0.8, 1.2) : gsap.utils.random(0.5, 0.8)),
+      opacity: () => (el.root.classList.contains("dark") ? 0.03 : gsap.utils.random(0.1, 0.18)),
+      "--mesh-blur": () => (el.root.classList.contains("dark") ? "100px" : "60px"),
+      duration: () => gsap.utils.random(25, 40),
+      ease: "sine.inOut",
+      repeat: -1,
+      yoyo: true,
+      repeatRefresh: true,
+    });
+  });
+};
+
 lucide.createIcons();
 syncThemeToggle();
 renderApiMask();
@@ -1088,6 +1115,7 @@ clearPromptEditor();
 updatePromptInputLimits();
 updatePromptTitlePlaceholder();
 gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+initMeshBackgroundAnimation();
 
 gsap.fromTo(
   ".hero-word",

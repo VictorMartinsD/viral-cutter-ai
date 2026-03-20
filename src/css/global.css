@@ -3,25 +3,74 @@
 }
 
 body {
-  background:
-    radial-gradient(1000px 600px at 10% -10%, rgba(82, 82, 91, 0.45), transparent 62%),
-    radial-gradient(880px 500px at 90% 0%, rgba(39, 39, 42, 0.35), transparent 60%),
-    linear-gradient(180deg, #0b0b0f 0%, #111115 100%);
+  background-color: #f1f5f9;
 }
 
-html:not(.dark) body {
-  background:
-    radial-gradient(1000px 600px at 10% -10%, rgba(161, 161, 170, 0.32), transparent 62%),
-    radial-gradient(880px 500px at 90% 0%, rgba(113, 113, 122, 0.25), transparent 60%),
-    linear-gradient(180deg, #ececee 0%, #e8e8ea 100%);
+html.dark body {
+  background-color: #050505;
 }
 
-.timeline-grid {
-  background-image:
-    linear-gradient(rgba(113, 113, 122, 0.35) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(113, 113, 122, 0.25) 1px, transparent 1px);
-  background-size: 56px 28px;
-  mask-image: radial-gradient(circle at center, black 58%, transparent 100%);
+.premium-background {
+  background: transparent;
+  z-index: -16;
+}
+
+html.dark .premium-background {
+  background: transparent;
+}
+
+.mesh-spot {
+  will-change: transform;
+}
+
+html:not(.dark) .mesh-spot {
+  backdrop-filter: saturate(150%) blur(100px);
+  -webkit-backdrop-filter: saturate(150%) blur(100px);
+  filter: blur(var(--mesh-blur, 60px)) saturate(200%) brightness(90%);
+  mix-blend-mode: multiply;
+}
+
+html.dark .mesh-spot {
+  backdrop-filter: blur(100px);
+  -webkit-backdrop-filter: blur(100px);
+  filter: blur(var(--mesh-blur, 100px));
+}
+
+.engineering-grid {
+  opacity: 0.25;
+  background-image: radial-gradient(circle, rgba(148, 163, 184, 1) 1px, transparent 1px);
+  background-size: 22px 22px;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: radial-gradient(circle, black 40%, transparent 85%);
+  mask-image: radial-gradient(circle, black 40%, transparent 85%);
+  z-index: -15;
+}
+
+html.dark .engineering-grid {
+  opacity: 0.08;
+  background-image: radial-gradient(circle, rgba(100, 116, 139, 0.95) 1px, transparent 1px);
+  mix-blend-mode: screen;
+}
+
+.grain-overlay {
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.95'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
+  background-repeat: repeat;
+  mix-blend-mode: multiply;
+  z-index: -14;
+}
+
+html.dark .grain-overlay {
+  mix-blend-mode: soft-light;
+}
+
+#beneficios article p {
+  color: #334155;
+}
+
+html.dark #beneficios article p {
+  color: #cbd5e1;
 }
 
 .hero-word,
