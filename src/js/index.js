@@ -20,6 +20,12 @@ const el = {
   apiModalBackdrop: document.getElementById("apiModalBackdrop"),
   apiModalCard: document.getElementById("apiModalCard"),
   closeApiModal: document.getElementById("closeApiModal"),
+  customDialog: document.getElementById("customDialog"),
+  customDialogCard: document.getElementById("customDialogCard"),
+  customDialogTitle: document.getElementById("customDialogTitle"),
+  customDialogMessage: document.getElementById("customDialogMessage"),
+  customDialogCancel: document.getElementById("customDialogCancel"),
+  customDialogConfirm: document.getElementById("customDialogConfirm"),
   securityToggle: document.getElementById("securityToggle"),
   securityDetails: document.getElementById("securityDetails"),
   securityChevron: document.getElementById("securityChevron"),
@@ -57,6 +63,8 @@ const app = {
   selectedVideoIds: [],
   isVideoSelectionMode: false,
   currentVideoId: null,
+  dialogResolver: null,
+  dialogIsClosing: false,
 };
 
 const config = {
@@ -313,6 +321,90 @@ const updatePromptInputLimits = () => {
 const animateButtonPress = (buttonElement) => {
   gsap.fromTo(buttonElement, { scale: 1 }, { scale: 0.97, duration: 0.08, yoyo: true, repeat: 1, ease: "power1.out" });
 };
+
+const resolveCustomDialog = (value) => {
+  if (!app.dialogResolver) {
+    return;
+  }
+
+  const resolver = app.dialogResolver;
+  app.dialogResolver = null;
+  resolver(value);
+};
+
+const closeCustomDialog = (isConfirmed) => {
+  if (!el.customDialog.open || app.dialogIsClosing) {
+    return;
+  }
+
+  app.dialogIsClosing = true;
+  gsap.killTweensOf([el.customDialog, el.customDialogCard]);
+
+  gsap.to(el.customDialogCard, {
+    autoAlpha: 0,
+    scale: 0.95,
+    y: 10,
+    duration: 0.2,
+    ease: "power2.in",
+  });
+
+  gsap.to(el.customDialog, {
+    autoAlpha: 0,
+    duration: 0.16,
+    ease: "power1.in",
+    onComplete: () => {
+      el.customDialog.close();
+      app.dialogIsClosing = false;
+      resolveCustomDialog(isConfirmed);
+    },
+  });
+};
+
+const showCustomDialog = ({ title, message, confirmLabel = "Confirmar", cancelLabel = "Cancelar", isAlert = false }) =>
+  new Promise((resolve) => {
+    if (el.customDialog.open) {
+      el.customDialog.close();
+      resolveCustomDialog(false);
+    }
+
+    app.dialogResolver = resolve;
+    app.dialogIsClosing = false;
+
+    el.customDialogTitle.textContent = title;
+    el.customDialogMessage.textContent = message;
+    el.customDialogConfirm.textContent = confirmLabel;
+    el.customDialogCancel.textContent = cancelLabel;
+    el.customDialogCancel.classList.toggle("hidden", isAlert);
+
+    el.customDialog.showModal();
+    el.body.classList.add("modal-open");
+
+    gsap.killTweensOf([el.customDialog, el.customDialogCard]);
+    gsap.set(el.customDialog, { autoAlpha: 1 });
+    gsap.fromTo(
+      el.customDialogCard,
+      { autoAlpha: 0, scale: 0.95, y: 12 },
+      { autoAlpha: 1, scale: 1, y: 0, duration: 0.26, ease: "power2.out" },
+    );
+  });
+
+const showConfirmDialog = (message, options = {}) =>
+  showCustomDialog({
+    title: options.title || "Confirme a ação",
+    message,
+    confirmLabel: options.confirmLabel || "Confirmar",
+    cancelLabel: options.cancelLabel || "Cancelar",
+    isAlert: false,
+  });
+
+const showAlertDialog = (message, options = {}) =>
+  showCustomDialog({
+    title: options.title || "ClipMaker",
+    message,
+    confirmLabel: options.confirmLabel || "Entendi",
+    cancelLabel: "",
+    isAlert: true,
+  });
 
 const openPromptPanel = () => {
   gsap.killTweensOf(el.promptPanel);
@@ -594,10 +686,13 @@ const toggleVideoSelectionMode = () => {
   renderSavedVideos();
 };
 
-const deleteSelectedVideos = () => {
+const deleteSelectedVideos = async () => {
   if (!app.selectedVideoIds.length) return;
 
-  const accepted = confirm(`Deseja excluir ${app.selectedVideoIds.length} vídeo(s)?`);
+  const accepted = await showConfirmDialog(`Deseja excluir ${app.selectedVideoIds.length} vídeo(s)?`, {
+    title: "Excluir vídeos",
+    confirmLabel: "Excluir",
+  });
   if (!accepted) return;
 
   app.savedVideos = app.savedVideos.filter((v) => !app.selectedVideoIds.includes(v.id));
@@ -607,12 +702,14 @@ const deleteSelectedVideos = () => {
   updateVideoToolbarState();
 };
 
-const createPrompt = () => {
+const createPrompt = async () => {
   const titleRaw = el.promptTitleInput.value.trim();
   const text = el.promptTextInput.value.trim();
 
   if (!text) {
-    alert("Digite uma instrução para salvar o prompt.");
+    await showAlertDialog("Digite uma instrução para salvar o prompt.", {
+      title: "Prompt vazio",
+    });
     el.promptTextInput.focus();
     return;
   }
@@ -632,7 +729,7 @@ const createPrompt = () => {
   clearPromptEditor();
 };
 
-const updatePrompt = () => {
+const updatePrompt = async () => {
   const targetPrompt = app.prompts.find((prompt) => prompt.id === app.editingPromptId);
   if (!targetPrompt) {
     clearPromptEditor();
@@ -643,7 +740,9 @@ const updatePrompt = () => {
   const text = el.promptTextInput.value.trim();
 
   if (!text) {
-    alert("Digite uma instrução para salvar o prompt.");
+    await showAlertDialog("Digite uma instrução para salvar o prompt.", {
+      title: "Prompt vazio",
+    });
     el.promptTextInput.focus();
     return;
   }
@@ -668,7 +767,7 @@ const createConfig = () => {
   renderConfigList();
 };
 
-const saveCurrentSelectionToConfig = (configId) => {
+const saveCurrentSelectionToConfig = async (configId) => {
   const targetConfig = app.promptConfigs.find((cfg) => cfg.id === configId);
   if (!targetConfig) {
     return;
@@ -676,7 +775,9 @@ const saveCurrentSelectionToConfig = (configId) => {
 
   const activePromptIds = getActivePromptIds();
   if (!activePromptIds.length) {
-    alert("Ative ao menos um prompt para salvar na configuração.");
+    await showAlertDialog("Ative ao menos um prompt para salvar na configuração.", {
+      title: "Nada selecionado",
+    });
     return;
   }
 
@@ -721,8 +822,11 @@ const toggleConfigActivation = (configId) => {
   applyConfig(configId);
 };
 
-const clearAllPrompts = () => {
-  const accepted = confirm("Deseja realmente apagar todos os prompts salvos?");
+const clearAllPrompts = async () => {
+  const accepted = await showConfirmDialog("Deseja realmente apagar todos os prompts salvos?", {
+    title: "Apagar prompts",
+    confirmLabel: "Apagar",
+  });
   if (!accepted) {
     return;
   }
@@ -737,8 +841,11 @@ const clearAllPrompts = () => {
   clearPromptEditor();
 };
 
-const clearAllConfigs = () => {
-  const accepted = confirm("Deseja realmente apagar todas as configurações salvas?");
+const clearAllConfigs = async () => {
+  const accepted = await showConfirmDialog("Deseja realmente apagar todas as configurações salvas?", {
+    title: "Apagar configurações",
+    confirmLabel: "Apagar",
+  });
   if (!accepted) {
     return;
   }
@@ -1039,7 +1146,42 @@ el.apiHelpButton.addEventListener("click", openApiModal);
 el.closeApiModal.addEventListener("click", closeApiModal);
 el.apiModalBackdrop.addEventListener("click", closeApiModal);
 
+el.customDialogConfirm.addEventListener("click", () => {
+  closeCustomDialog(true);
+});
+
+el.customDialogCancel.addEventListener("click", () => {
+  closeCustomDialog(false);
+});
+
+el.customDialog.addEventListener("cancel", (event) => {
+  event.preventDefault();
+  closeCustomDialog(false);
+});
+
+el.customDialog.addEventListener("close", () => {
+  el.body.classList.remove("modal-open");
+
+  if (!app.dialogIsClosing) {
+    resolveCustomDialog(false);
+  }
+});
+
+el.customDialog.addEventListener("click", (event) => {
+  const bounds = el.customDialogCard.getBoundingClientRect();
+  const insideX = event.clientX >= bounds.left && event.clientX <= bounds.right;
+  const insideY = event.clientY >= bounds.top && event.clientY <= bounds.bottom;
+
+  if (!insideX || !insideY) {
+    closeCustomDialog(false);
+  }
+});
+
 document.addEventListener("keydown", (event) => {
+  if (el.customDialog.open) {
+    return;
+  }
+
   if (event.key === "Escape" && !el.apiModal.classList.contains("hidden")) {
     closeApiModal();
     return;
@@ -1072,19 +1214,22 @@ el.promptExamplesToggle.addEventListener("click", () => {
   hidePromptExamples();
 });
 
-el.savePromptBtn.addEventListener("click", () => {
+el.savePromptBtn.addEventListener("click", async () => {
   if (app.editingPromptId) {
-    updatePrompt();
+    await updatePrompt();
     return;
   }
 
-  createPrompt();
+  await createPrompt();
 });
 
-el.newPromptBtn.addEventListener("click", () => {
+el.newPromptBtn.addEventListener("click", async () => {
   const hasDraft = Boolean(el.promptTitleInput.value.trim() || el.promptTextInput.value.trim());
   if (hasDraft) {
-    const accepted = confirm("Seu prompt não foi salvo! Deseja apagar e criar um novo?");
+    const accepted = await showConfirmDialog("Seu prompt não foi salvo! Deseja apagar e criar um novo?", {
+      title: "Descartar rascunho",
+      confirmLabel: "Apagar",
+    });
     if (!accepted) {
       return;
     }
@@ -1097,7 +1242,7 @@ el.addPromptConfigBtn.addEventListener("click", createConfig);
 el.clearAllPromptsBtn.addEventListener("click", clearAllPrompts);
 el.clearAllConfigsBtn.addEventListener("click", clearAllConfigs);
 
-el.promptList.addEventListener("click", (event) => {
+el.promptList.addEventListener("click", async (event) => {
   const toggleId = event.target.getAttribute("data-prompt-toggle-id");
   if (toggleId) {
     const targetPrompt = app.prompts.find((prompt) => prompt.id === toggleId);
@@ -1174,7 +1319,10 @@ el.promptList.addEventListener("click", (event) => {
       return;
     }
 
-    const accepted = confirm(`Excluir o prompt "${targetPrompt.title}"?`);
+    const accepted = await showConfirmDialog(`Excluir o prompt "${targetPrompt.title}"?`, {
+      title: "Excluir prompt",
+      confirmLabel: "Excluir",
+    });
     if (!accepted) {
       return;
     }
@@ -1208,7 +1356,7 @@ el.promptList.addEventListener("click", (event) => {
   }
 });
 
-el.promptConfigList.addEventListener("click", (event) => {
+el.promptConfigList.addEventListener("click", async (event) => {
   const toggleId = event.target.getAttribute("data-config-toggle-id");
   if (toggleId) {
     toggleConfigActivation(toggleId);
@@ -1261,7 +1409,10 @@ el.promptConfigList.addEventListener("click", (event) => {
       return;
     }
 
-    const accepted = confirm(`Excluir a configuração "${targetConfig.name}"?`);
+    const accepted = await showConfirmDialog(`Excluir a configuração "${targetConfig.name}"?`, {
+      title: "Excluir configuração",
+      confirmLabel: "Excluir",
+    });
     if (!accepted) {
       return;
     }
@@ -1392,9 +1543,12 @@ el.apiKey.addEventListener("focus", () => {
   });
 });
 
-el.button.addEventListener("click", () => {
+el.button.addEventListener("click", async () => {
   if (!app.apiKeyRawValue) {
-    alert("Por favor, insira sua API do Gemini primeiro.");
+    await showAlertDialog("Por favor, insira sua API do Gemini primeiro.", {
+      title: "API ausente",
+      confirmLabel: "Ok",
+    });
     el.apiKey.focus();
     return;
   }
@@ -1444,7 +1598,7 @@ el.savedVideosDeselectAll.addEventListener("click", () => {
 });
 el.savedVideosDeleteSelected.addEventListener("click", deleteSelectedVideos);
 
-el.savedVideosList.addEventListener("click", (event) => {
+el.savedVideosList.addEventListener("click", async (event) => {
   // Handle video title rename
   const titleElement = event.target.closest(".saved-video-title");
   if (titleElement && !app.isVideoSelectionMode) {
@@ -1490,7 +1644,10 @@ el.savedVideosList.addEventListener("click", (event) => {
     const video = app.savedVideos.find((v) => v.id === videoId);
     if (!video) return;
 
-    const accepted = confirm(`Excluir o vídeo "${video.name}"?`);
+    const accepted = await showConfirmDialog(`Excluir o vídeo "${video.name}"?`, {
+      title: "Excluir vídeo",
+      confirmLabel: "Excluir",
+    });
     if (!accepted) return;
 
     app.savedVideos = app.savedVideos.filter((v) => v.id !== videoId);
