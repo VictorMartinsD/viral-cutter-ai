@@ -217,17 +217,15 @@ const setCurrentVideoTitle = (title = "") => {
 };
 
 const isMobileViewport = () => window.innerWidth < 768;
+const canUseSavedVideoHoverEffects = () =>
+  window.matchMedia("(hover: hover) and (pointer: fine)").matches && !isMobileViewport();
 
 const getCloudinaryThumb = (video) => {
-  if (video.thumbnailUrl) {
-    return video.thumbnailUrl;
-  }
-
   if (!video.public_id) {
-    return "";
+    return video.thumbnailUrl || "";
   }
 
-  return `https://res.cloudinary.com/${config.cloudName}/video/upload/so_0,w_360,h_360,c_fill/${video.public_id}.jpg`;
+  return `https://res.cloudinary.com/${config.cloudName}/video/upload/so_2,w_960,h_540,c_fill,g_auto,q_auto,f_jpg/${video.public_id}.jpg`;
 };
 
 const getSavedVideoURL = (video) => {
@@ -619,6 +617,11 @@ const renderSavedVideos = () => {
       <div class="saved-video-item ${app.selectedVideoIds.includes(video.id) ? "selected" : ""} ${app.currentVideoId === video.id ? "is-current" : ""}" data-video-id="${escapeHTML(video.id)}">
         <div class="saved-video-thumbnail">
           <img class="saved-video-thumb-img" src="${escapeHTML(getCloudinaryThumb(video))}" alt="Miniatura de ${escapeHTML(video.name)}" loading="lazy" />
+          <div class="saved-video-overlay">
+            <span class="saved-video-play-indicator">
+              <i data-lucide="play"></i>
+            </span>
+          </div>
           <button type="button" class="saved-video-close-btn" data-video-delete-id="${escapeHTML(video.id)}" title="Excluir">×</button>
           ${video.isNew ? '<div class="saved-video-new-badge">NOVO</div>' : ""}
           ${app.isVideoSelectionMode ? '<div class="saved-video-checkbox"></div>' : ""}
@@ -1597,6 +1600,54 @@ el.savedVideosDeselectAll.addEventListener("click", () => {
   renderSavedVideos();
 });
 el.savedVideosDeleteSelected.addEventListener("click", deleteSelectedVideos);
+
+el.savedVideosList.addEventListener("mouseover", (event) => {
+  if (!canUseSavedVideoHoverEffects()) {
+    return;
+  }
+
+  const card = event.target.closest(".saved-video-item");
+  if (!card) {
+    return;
+  }
+
+  if (card.contains(event.relatedTarget)) {
+    return;
+  }
+
+  const imageElement = card.querySelector(".saved-video-thumb-img");
+  const playElement = card.querySelector(".saved-video-play-indicator");
+  if (!imageElement || !playElement) {
+    return;
+  }
+
+  gsap.to(imageElement, { scale: 1.05, duration: 0.3, ease: "power2.out" });
+  gsap.to(playElement, { scale: 1.1, duration: 0.3, ease: "power2.out" });
+});
+
+el.savedVideosList.addEventListener("mouseout", (event) => {
+  if (!canUseSavedVideoHoverEffects()) {
+    return;
+  }
+
+  const card = event.target.closest(".saved-video-item");
+  if (!card) {
+    return;
+  }
+
+  if (card.contains(event.relatedTarget)) {
+    return;
+  }
+
+  const imageElement = card.querySelector(".saved-video-thumb-img");
+  const playElement = card.querySelector(".saved-video-play-indicator");
+  if (!imageElement || !playElement) {
+    return;
+  }
+
+  gsap.to(imageElement, { scale: 1, duration: 0.3, ease: "power2.out" });
+  gsap.to(playElement, { scale: 1, duration: 0.3, ease: "power2.out" });
+});
 
 el.savedVideosList.addEventListener("click", async (event) => {
   // Handle video title rename
