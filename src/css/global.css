@@ -10,6 +10,11 @@ html.dark body {
   background-color: #050505;
 }
 
+:root {
+  --state-transition-duration: 0.22s;
+  --state-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .premium-background {
   background: transparent;
   z-index: -16;
@@ -392,9 +397,9 @@ html:not(.dark) .custom-dialog-btn-confirm {
   position: relative;
   cursor: pointer;
   transition:
-    background 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
+    background-color var(--state-transition-duration) var(--state-transition-ease),
+    box-shadow var(--state-transition-duration) var(--state-transition-ease),
+    border-color var(--state-transition-duration) var(--state-transition-ease);
 }
 
 html.dark .prompt-item {
@@ -593,9 +598,9 @@ html.dark .prompt-chip-btn:hover {
   min-width: 0;
   overflow: hidden;
   transition:
-    background 0.25s ease,
-    box-shadow 0.25s ease,
-    border-color 0.25s ease;
+    background-color var(--state-transition-duration) var(--state-transition-ease),
+    box-shadow var(--state-transition-duration) var(--state-transition-ease),
+    border-color var(--state-transition-duration) var(--state-transition-ease);
 }
 
 html.dark .config-card {
@@ -854,9 +859,9 @@ html.dark .cloudinary-widget [class*="primary"]:hover {
     0 0 0 0 rgba(56, 189, 248, 0),
     0 0 0 rgba(14, 165, 233, 0);
   transition:
-    background 0.25s ease,
-    border-color 0.25s ease,
-    box-shadow 0.28s ease;
+    background-color var(--state-transition-duration) var(--state-transition-ease),
+    border-color var(--state-transition-duration) var(--state-transition-ease),
+    box-shadow var(--state-transition-duration) var(--state-transition-ease);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -986,6 +991,24 @@ html.dark .saved-video-close-btn {
   border: 2px solid #fff;
   border-radius: 0.4rem;
   z-index: 10;
+  transition:
+    background-color var(--state-transition-duration) var(--state-transition-ease),
+    border-color var(--state-transition-duration) var(--state-transition-ease);
+}
+
+.saved-video-checkbox::after {
+  content: "✓";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.85);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+  opacity: 0;
+  transition:
+    opacity var(--state-transition-duration) var(--state-transition-ease),
+    transform var(--state-transition-duration) var(--state-transition-ease);
 }
 
 .saved-video-item.selected .saved-video-checkbox {
@@ -994,14 +1017,8 @@ html.dark .saved-video-close-btn {
 }
 
 .saved-video-item.selected .saved-video-checkbox::after {
-  content: "✓";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: #fff;
-  font-size: 12px;
-  font-weight: 900;
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .saved-video-title {
