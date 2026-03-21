@@ -63,6 +63,8 @@ const app = {
   selectedVideoIds: [],
   isVideoSelectionMode: false,
   currentVideoId: null,
+  latestUploadedVideoId: null,
+  isSuccessJumpBarVisible: false,
   dialogResolver: null,
   dialogIsClosing: false,
 };
@@ -97,6 +99,92 @@ const updateStatus = (message, loading = false) => {
 
 const setVideoFrameLoading = (isLoading) => {
   el.videoFrame.classList.toggle("video-loading", isLoading);
+};
+
+const isWideViewportForSuccessBar = () => window.innerWidth > 789;
+
+const scrollToVideoFrame = () => {
+  gsap.to(window, {
+    duration: 0.72,
+    scrollTo: {
+      y: "#videoFrame",
+      offsetY: 96,
+    },
+    ease: "power2.out",
+  });
+};
+
+const isNearVideoFrame = () => {
+  if (!el.videoFrame) {
+    return false;
+  }
+
+  const rect = el.videoFrame.getBoundingClientRect();
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+  const topThreshold = viewportHeight * 0.88;
+  const bottomThreshold = 64;
+
+  return rect.top <= topThreshold && rect.bottom >= bottomThreshold;
+};
+
+const ensureSuccessJumpBar = () => {
+  if (el.successJumpBar) {
+    return el.successJumpBar;
+  }
+
+  const bar = document.createElement("button");
+  bar.type = "button";
+  bar.className = "success-jump-bar";
+  bar.setAttribute("aria-live", "polite");
+  bar.setAttribute("aria-label", "Corte gerado com sucesso. Ir para o player");
+  bar.innerHTML =
+    '<span class="success-jump-bar-icon">\u2713</span><span class="success-jump-bar-text">Corte gerado com sucesso.</span>';
+
+  bar.addEventListener("click", () => {
+    hideSuccessJumpBar();
+    scrollToVideoFrame();
+  });
+
+  document.body.appendChild(bar);
+  el.successJumpBar = bar;
+  return bar;
+};
+
+const hideSuccessJumpBar = () => {
+  if (!el.successJumpBar) {
+    return;
+  }
+
+  el.successJumpBar.classList.remove("is-visible");
+  app.isSuccessJumpBarVisible = false;
+};
+
+const showSuccessJumpBar = () => {
+  const bar = ensureSuccessJumpBar();
+  if (!isWideViewportForSuccessBar()) {
+    hideSuccessJumpBar();
+    return;
+  }
+
+  bar.classList.add("is-visible");
+  app.isSuccessJumpBarVisible = true;
+};
+
+const handleUploadSuccessFeedback = (uploadedVideoId) => {
+  app.latestUploadedVideoId = uploadedVideoId;
+
+  if (!isWideViewportForSuccessBar()) {
+    hideSuccessJumpBar();
+    scrollToVideoFrame();
+    return;
+  }
+
+  if (isNearVideoFrame()) {
+    hideSuccessJumpBar();
+    return;
+  }
+
+  showSuccessJumpBar();
 };
 
 const syncThemeToggle = () => {
@@ -719,14 +807,11 @@ const playSavedVideo = (videoId) => {
     return;
   }
 
-  gsap.to(window, {
-    duration: 0.72,
-    scrollTo: {
-      y: "#videoFrame",
-      offsetY: 96,
-    },
-    ease: "power2.out",
-  });
+  if (app.latestUploadedVideoId && videoId === app.latestUploadedVideoId) {
+    hideSuccessJumpBar();
+  }
+
+  scrollToVideoFrame();
 
   setVideoFrameLoading(true);
   el.video.addEventListener(
@@ -1128,6 +1213,7 @@ const processWidgetResult = async (error, result) => {
         app.currentVideoId = newVideo.id;
         saveSavedVideos();
         renderSavedVideos();
+        handleUploadSuccessFeedback(newVideo.id);
       },
       { once: true },
     );
@@ -1674,6 +1760,12 @@ el.apiHelpButton.addEventListener("click", () => {
   animateButtonPress(el.apiHelpButton);
 });
 
+el.video.addEventListener("play", () => {
+  if (app.latestUploadedVideoId && app.currentVideoId === app.latestUploadedVideoId) {
+    hideSuccessJumpBar();
+  }
+});
+
 document.addEventListener("click", (event) => {
   const titleElement = event.target.closest("#videoNowTitle");
   if (!titleElement || titleElement.matches("input.player-video-title-input")) {
@@ -1696,6 +1788,9 @@ window.addEventListener(
   () => {
     renderPromptUI();
     updateVideoToolbarState();
+    if (!isWideViewportForSuccessBar()) {
+      hideSuccessJumpBar();
+    }
   },
   { passive: true },
 );
@@ -1825,6 +1920,10 @@ el.savedVideosList.addEventListener("click", async (event) => {
     if (!accepted) return;
 
     app.savedVideos = app.savedVideos.filter((v) => v.id !== videoId);
+    if (app.latestUploadedVideoId === videoId) {
+      app.latestUploadedVideoId = null;
+      hideSuccessJumpBar();
+    }
     saveSavedVideos();
     renderSavedVideos();
     return;
