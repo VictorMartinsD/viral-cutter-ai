@@ -213,7 +213,72 @@ const setCurrentVideoTitle = (title = "") => {
   if (!el.videoNowTitle) {
     return;
   }
+  if (el.videoNowTitle.matches("input.player-video-title-input")) {
+    return;
+  }
   el.videoNowTitle.textContent = truncatePlayerVideoTitle(title);
+  el.videoNowTitle.setAttribute("title", title || "");
+};
+
+const startCurrentVideoTitleEdit = () => {
+  if (!el.videoNowTitle || el.videoNowTitle.matches("input.player-video-title-input") || !app.currentVideoId) {
+    return;
+  }
+
+  const currentVideo = app.savedVideos.find((video) => video.id === app.currentVideoId);
+  if (!currentVideo) {
+    return;
+  }
+
+  const titleElement = el.videoNowTitle;
+  const originalTitle = currentVideo.name;
+  const originalClassName = titleElement.className;
+  const originalMarginTop = window.getComputedStyle(titleElement).marginTop;
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.id = "videoNowTitle";
+  input.className = "saved-video-title-input player-video-title-input";
+  input.value = originalTitle;
+  input.maxLength = 100;
+  input.setAttribute("aria-label", "Editar título do vídeo atual");
+  input.style.marginTop = originalMarginTop;
+
+  titleElement.replaceWith(input);
+  el.videoNowTitle = input;
+  input.focus();
+  input.select();
+
+  const finishEdit = (shouldCommit) => {
+    const nextTitle = input.value.trim();
+    const finalTitle = shouldCommit && nextTitle ? nextTitle : originalTitle;
+
+    if (shouldCommit && nextTitle && nextTitle !== originalTitle) {
+      currentVideo.name = nextTitle;
+      saveSavedVideos();
+      renderSavedVideos();
+    }
+
+    const titleOutput = document.createElement("p");
+    titleOutput.id = "videoNowTitle";
+    titleOutput.className = originalClassName;
+    titleOutput.textContent = truncatePlayerVideoTitle(finalTitle);
+    titleOutput.setAttribute("title", finalTitle);
+
+    input.replaceWith(titleOutput);
+    el.videoNowTitle = titleOutput;
+  };
+
+  input.addEventListener("blur", () => finishEdit(true));
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      finishEdit(true);
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      finishEdit(false);
+    }
+  });
 };
 
 const isMobileViewport = () => window.innerWidth < 768;
@@ -1598,6 +1663,15 @@ el.button.addEventListener("click", async () => {
 
 el.apiHelpButton.addEventListener("click", () => {
   animateButtonPress(el.apiHelpButton);
+});
+
+document.addEventListener("click", (event) => {
+  const titleElement = event.target.closest("#videoNowTitle");
+  if (!titleElement || titleElement.matches("input.player-video-title-input")) {
+    return;
+  }
+
+  startCurrentVideoTitleEdit();
 });
 
 window.addEventListener(

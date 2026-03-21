@@ -113,10 +113,29 @@ html.dark .title-accent {
   display: block;
   width: 100%;
   max-width: 100%;
-  min-height: 1.6rem;
+  height: 2.2rem;
+  min-height: 2.2rem;
+  max-height: 2.2rem;
+  line-height: 1.7rem;
+  padding: 0.25rem 0.4rem;
+  border-radius: 0.4rem;
+  box-sizing: border-box;
+  cursor: text;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+#videoNowTitle:hover {
+  background: rgba(161, 161, 170, 0.15);
+}
+
+html.dark #videoNowTitle:hover {
+  background: rgba(82, 82, 91, 0.3);
+}
+
+.player-video-title-input {
+  text-align: center;
 }
 
 .video-loading::before {
