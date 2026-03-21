@@ -719,6 +719,15 @@ const playSavedVideo = (videoId) => {
     return;
   }
 
+  gsap.to(window, {
+    duration: 0.72,
+    scrollTo: {
+      y: "#videoFrame",
+      offsetY: 96,
+    },
+    ease: "power2.out",
+  });
+
   setVideoFrameLoading(true);
   el.video.addEventListener(
     "loadeddata",
