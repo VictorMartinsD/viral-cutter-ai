@@ -919,6 +919,23 @@ html.dark .config-card.is-active {
   align-items: stretch;
 }
 
+#promptConfigList {
+  min-height: 11.5rem;
+  align-content: start;
+}
+
+.config-empty-state {
+  width: 100%;
+  min-height: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  white-space: nowrap;
+  line-height: 1.35;
+}
+
 @media (min-width: 1024px) {
   .prompt-builder-grid > section {
     min-height: 28rem;
@@ -967,6 +984,13 @@ html.dark .config-card.is-active {
   max-height: 20.3rem;
 }
 
+@media (max-width: 1023px) {
+  .config-empty-state {
+    white-space: normal;
+    word-break: break-word;
+  }
+}
+
 @media (max-width: 767px) {
   .prompt-list-scroll {
     max-height: 24.2rem;
@@ -974,6 +998,10 @@ html.dark .config-card.is-active {
 
   .prompt-config-scroll {
     max-height: 17.2rem;
+  }
+
+  #promptConfigList {
+    min-height: 9.2rem;
   }
 }
 

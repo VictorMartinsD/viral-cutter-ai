@@ -26,6 +26,7 @@ const el = {
   customDialogMessage: document.getElementById("customDialogMessage"),
   customDialogCancel: document.getElementById("customDialogCancel"),
   customDialogConfirm: document.getElementById("customDialogConfirm"),
+  customDialogActions: document.querySelector("#customDialog .custom-dialog-actions"),
   securityToggle: document.getElementById("securityToggle"),
   securityDetails: document.getElementById("securityDetails"),
   securityChevron: document.getElementById("securityChevron"),
@@ -395,6 +396,20 @@ const getSavedVideoURL = (video) => {
 
 const getActivePromptIds = () => app.prompts.filter((prompt) => prompt.active).map((prompt) => prompt.id);
 
+const getPromptCombinationKey = (promptIds = []) => [...new Set(promptIds)].sort().join("|");
+
+const syncActiveConfigWithPromptSelection = () => {
+  const activePromptIds = getActivePromptIds();
+  if (!activePromptIds.length) {
+    app.activeConfigId = null;
+    return;
+  }
+
+  const activeKey = getPromptCombinationKey(activePromptIds);
+  const matchedConfig = app.promptConfigs.find((cfg) => getPromptCombinationKey(cfg.promptIds) === activeKey);
+  app.activeConfigId = matchedConfig ? matchedConfig.id : null;
+};
+
 const savePromptState = () => {
   localStorage.setItem(storageKeys.prompts, JSON.stringify(app.prompts));
   localStorage.setItem(storageKeys.promptConfigs, JSON.stringify(app.promptConfigs));
@@ -491,7 +506,17 @@ const resolveCustomDialog = (value) => {
   resolver(value);
 };
 
-const closeCustomDialog = (isConfirmed) => {
+const removeCustomDialogExtraButtons = () => {
+  if (!el.customDialogActions) {
+    return;
+  }
+
+  el.customDialogActions.querySelectorAll("[data-custom-dialog-extra]").forEach((button) => {
+    button.remove();
+  });
+};
+
+const closeCustomDialog = (resultValue) => {
   if (!el.customDialog.open || app.dialogIsClosing) {
     return;
   }
@@ -514,12 +539,20 @@ const closeCustomDialog = (isConfirmed) => {
     onComplete: () => {
       el.customDialog.close();
       app.dialogIsClosing = false;
-      resolveCustomDialog(isConfirmed);
+      resolveCustomDialog(resultValue);
     },
   });
 };
 
-const showCustomDialog = ({ title, message, confirmLabel = "Confirmar", cancelLabel = "Cancelar", isAlert = false }) =>
+const showCustomDialog = ({
+  title,
+  message,
+  messageHTML = "",
+  confirmLabel = "Confirmar",
+  cancelLabel = "Cancelar",
+  isAlert = false,
+  extraActions = [],
+}) =>
   new Promise((resolve) => {
     if (el.customDialog.open) {
       el.customDialog.close();
@@ -530,10 +563,30 @@ const showCustomDialog = ({ title, message, confirmLabel = "Confirmar", cancelLa
     app.dialogIsClosing = false;
 
     el.customDialogTitle.textContent = title;
-    el.customDialogMessage.textContent = message;
+    if (messageHTML) {
+      el.customDialogMessage.innerHTML = messageHTML;
+    } else {
+      el.customDialogMessage.textContent = message;
+    }
     el.customDialogConfirm.textContent = confirmLabel;
     el.customDialogCancel.textContent = cancelLabel;
     el.customDialogCancel.classList.toggle("hidden", isAlert);
+
+    removeCustomDialogExtraButtons();
+    extraActions.forEach((action) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `custom-dialog-btn ${
+        action.variant === "confirm" ? "custom-dialog-btn-confirm" : "custom-dialog-btn-cancel"
+      }`;
+      button.textContent = action.label;
+      button.dataset.customDialogExtra = "true";
+      button.addEventListener("click", () => {
+        closeCustomDialog(action.value);
+      });
+
+      el.customDialogActions.insertBefore(button, el.customDialogCancel);
+    });
 
     el.customDialog.showModal();
     el.body.classList.add("modal-open");
@@ -560,6 +613,7 @@ const showAlertDialog = (message, options = {}) =>
   showCustomDialog({
     title: options.title || "ClipMaker",
     message,
+    messageHTML: options.messageHTML || "",
     confirmLabel: options.confirmLabel || "Entendi",
     cancelLabel: "",
     isAlert: true,
@@ -687,7 +741,7 @@ const renderPromptList = () => {
 const renderConfigList = () => {
   if (!app.promptConfigs.length) {
     el.promptConfigList.innerHTML =
-      '<p class="rounded-xl border border-dashed border-zinc-300 p-3 text-xs text-slate-600 dark:border-zinc-700 dark:text-zinc-400">Nenhuma configuração criada. Salve combinações para reutilizar em vários uploads.</p>';
+      '<p class="config-empty-state col-span-full rounded-xl border border-dashed border-zinc-300 p-3 text-xs text-slate-600 dark:border-zinc-700 dark:text-zinc-400">Nenhuma configuração criada. Salve combinações para reutilizar em vários uploads.</p>';
     return;
   }
 
@@ -700,7 +754,6 @@ const renderConfigList = () => {
         .map((promptId) => app.prompts.find((prompt) => prompt.id === promptId)?.title)
         .filter(Boolean);
       const promptCount = promptTitles.length;
-      const isSavable = activePromptIds.length > 0;
       const subtitleText = `${promptCount} prompt(s) nesta configuração`;
 
       return `
@@ -891,14 +944,14 @@ const createPrompt = async () => {
 
   const title = titleRaw || `Prompt ${app.prompts.length + 1}`;
 
-  app.prompts.push({
+  app.prompts.unshift({
     id: generateId("prompt"),
     title,
     text,
     active: true,
   });
 
-  app.activeConfigId = null;
+  syncActiveConfigWithPromptSelection();
   savePromptState();
   renderPromptUI();
   clearPromptEditor();
@@ -930,13 +983,53 @@ const updatePrompt = async () => {
   clearPromptEditor();
 };
 
-const createConfig = () => {
+const createConfig = async () => {
+  const activePromptIds = getActivePromptIds();
+  if (activePromptIds.length < 2) {
+    showAlertDialog("", {
+      title: "Combinação indisponível",
+      messageHTML: "Ative 2 ou mais prompts em <strong>prompts salvos</strong> para salvar uma combinação.",
+    });
+    return;
+  }
+
+  const activeCombinationKey = getPromptCombinationKey(activePromptIds);
+  const existingConfig = app.promptConfigs.find(
+    (cfg) => getPromptCombinationKey(cfg.promptIds) === activeCombinationKey,
+  );
+
+  if (existingConfig) {
+    app.activeConfigId = existingConfig.id;
+    savePromptState();
+    renderPromptUI();
+
+    const decision = await showCustomDialog({
+      title: "Configuração já existente",
+      message: "",
+      messageHTML: `Essa combinação já existe e ela está <strong>ativada</strong>, ela está nomeada como <strong>${escapeHTML(existingConfig.name)}</strong>.<br /><br />Deseja <strong>desativar</strong> essa configuração?`,
+      confirmLabel: "Desativar",
+      cancelLabel: "Cancelar",
+      isAlert: false,
+      extraActions: [{ label: "Manter Ativado", value: "keep-active", variant: "cancel" }],
+    });
+
+    if (decision === true) {
+      deactivateConfig();
+    }
+
+    return;
+  }
+
   const defaultName = `Configuração ${app.promptConfigs.length + 1}`;
-  app.promptConfigs.push({
-    id: generateId("config"),
+  const configId = generateId("config");
+
+  app.promptConfigs.unshift({
+    id: configId,
     name: defaultName,
-    promptIds: [],
+    promptIds: [...activePromptIds],
   });
+
+  app.activeConfigId = configId;
 
   savePromptState();
   renderConfigList();
@@ -1444,7 +1537,7 @@ el.promptList.addEventListener("click", async (event) => {
     const targetPrompt = app.prompts.find((prompt) => prompt.id === toggleId);
     if (targetPrompt) {
       targetPrompt.active = !targetPrompt.active;
-      app.activeConfigId = null;
+      syncActiveConfigWithPromptSelection();
       savePromptState();
       renderPromptUI();
     }
@@ -1533,6 +1626,7 @@ el.promptList.addEventListener("click", async (event) => {
       clearPromptEditor();
     }
 
+    syncActiveConfigWithPromptSelection();
     savePromptState();
     renderPromptUI();
     return;
@@ -1545,7 +1639,7 @@ el.promptList.addEventListener("click", async (event) => {
     const targetPrompt = app.prompts.find((prompt) => prompt.id === promptId);
     if (targetPrompt) {
       targetPrompt.active = !targetPrompt.active;
-      app.activeConfigId = null;
+      syncActiveConfigWithPromptSelection();
       savePromptState();
       renderPromptUI();
     }
