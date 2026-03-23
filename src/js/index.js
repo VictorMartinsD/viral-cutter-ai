@@ -13,6 +13,7 @@ import {
   truncateVideoTitle,
   truncatePlayerVideoTitle,
 } from "./utils.js";
+import { initTheme } from "./theme.js";
 
 const el = {
   root: document.documentElement,
@@ -23,9 +24,6 @@ const el = {
   videoFrame: document.getElementById("videoFrame"),
   apiKey: document.getElementById("apiKey"),
   button: document.getElementById("uploadWidget"),
-  themeToggle: document.getElementById("themeToggle"),
-  themeBulbOn: document.getElementById("themeBulbOn"),
-  themeBulbOff: document.getElementById("themeBulbOff"),
   apiHelpButton: document.getElementById("apiHelpButton"),
   apiModal: document.getElementById("apiModal"),
   apiModalBackdrop: document.getElementById("apiModalBackdrop"),
@@ -195,14 +193,6 @@ const handleUploadSuccessFeedback = (uploadedVideoId) => {
   }
 
   showSuccessJumpBar();
-};
-
-const syncThemeToggle = () => {
-  const isDark = el.root.classList.contains("dark");
-  el.themeBulbOn.classList.toggle("hidden", isDark);
-  el.themeBulbOff.classList.toggle("hidden", !isDark);
-  el.themeToggle.classList.toggle("text-amber-500", !isDark);
-  el.themeToggle.classList.toggle("text-zinc-400", isDark);
 };
 
 const getWidgetStyles = () => {
@@ -1307,7 +1297,14 @@ const initMeshBackgroundAnimation = () => {
 };
 
 lucide.createIcons();
-syncThemeToggle();
+initTheme({
+  onToggle: () => {
+    if (app.widget) {
+      app.widget.destroy();
+      app.widget = null;
+    }
+  },
+});
 renderApiMask();
 loadPromptState();
 loadSavedVideos();
@@ -1368,16 +1365,6 @@ ScrollTrigger.create({
       },
     );
   },
-});
-
-el.themeToggle.addEventListener("click", () => {
-  el.root.classList.toggle("dark");
-  localStorage.setItem("clipmaker-theme", el.root.classList.contains("dark") ? "dark" : "light");
-  syncThemeToggle();
-  if (app.widget) {
-    app.widget.destroy();
-    app.widget = null;
-  }
 });
 
 el.apiHelpButton.addEventListener("click", openApiModal);
