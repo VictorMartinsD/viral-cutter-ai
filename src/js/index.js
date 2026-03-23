@@ -15,6 +15,7 @@ import {
 } from "./utils.js";
 import { initTheme } from "./theme.js";
 import { waitForTranscription, getTranscription, getViralMoment, processWidgetResult } from "./api.js";
+import { storageKeys, savePromptState, loadPromptState, loadSavedVideos, saveSavedVideos } from "./storage.js";
 
 const el = {
   root: document.documentElement,
@@ -83,13 +84,6 @@ const app = {
 const config = {
   cloudName: "df0kqv5py",
   uploadPreset: "upload_nlw",
-};
-
-const storageKeys = {
-  prompts: "clipmaker-prompts-v1",
-  promptConfigs: "clipmaker-prompt-configs-v1",
-  activeConfigId: "clipmaker-active-config-id-v1",
-  savedVideos: "clipmaker-saved-videos-v1",
 };
 
 const updateStatus = (message, loading = false) => {
@@ -284,7 +278,7 @@ const startCurrentVideoTitleEdit = () => {
 
     if (shouldCommit && nextTitle && nextTitle !== originalTitle) {
       currentVideo.name = nextTitle;
-      saveSavedVideos();
+      saveSavedVideos(app);
       renderSavedVideos();
     }
 
@@ -348,51 +342,6 @@ const syncActiveConfigWithPromptSelection = () => {
   const activeKey = getPromptCombinationKey(activePromptIds);
   const matchedConfig = app.promptConfigs.find((cfg) => getPromptCombinationKey(cfg.promptIds) === activeKey);
   app.activeConfigId = matchedConfig ? matchedConfig.id : null;
-};
-
-const savePromptState = () => {
-  localStorage.setItem(storageKeys.prompts, JSON.stringify(app.prompts));
-  localStorage.setItem(storageKeys.promptConfigs, JSON.stringify(app.promptConfigs));
-
-  if (app.activeConfigId) {
-    localStorage.setItem(storageKeys.activeConfigId, app.activeConfigId);
-  } else {
-    localStorage.removeItem(storageKeys.activeConfigId);
-  }
-};
-
-const loadPromptState = () => {
-  try {
-    const savedPrompts = JSON.parse(localStorage.getItem(storageKeys.prompts) || "[]");
-    const savedConfigs = JSON.parse(localStorage.getItem(storageKeys.promptConfigs) || "[]");
-    const savedActiveConfigId = localStorage.getItem(storageKeys.activeConfigId);
-
-    app.prompts = Array.isArray(savedPrompts)
-      ? savedPrompts
-          .map((prompt) => ({
-            id: prompt.id || generateId("prompt"),
-            title: (prompt.title || "Prompt sem título").trim(),
-            text: (prompt.text || "").trim(),
-            active: Boolean(prompt.active),
-          }))
-          .filter((prompt) => prompt.text)
-      : [];
-
-    app.promptConfigs = Array.isArray(savedConfigs)
-      ? savedConfigs.map((cfg) => ({
-          id: cfg.id || generateId("config"),
-          name: (cfg.name || "Configuração").trim(),
-          promptIds: Array.isArray(cfg.promptIds) ? cfg.promptIds : [],
-        }))
-      : [];
-
-    app.activeConfigId = savedActiveConfigId || null;
-  } catch (error) {
-    console.warn("Falha ao carregar prompts personalizados.", error);
-    app.prompts = [];
-    app.promptConfigs = [];
-    app.activeConfigId = null;
-  }
 };
 
 const clearPromptEditor = () => {
@@ -719,32 +668,6 @@ const renderPromptUI = () => {
   el.clearAllPromptsBtn.disabled = app.prompts.length === 0;
 };
 
-const loadSavedVideos = () => {
-  try {
-    const stored = localStorage.getItem(storageKeys.savedVideos);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      app.savedVideos = Array.isArray(parsed)
-        ? parsed.map((video) => ({
-            id: video.id || generateId("video"),
-            name: String(video.name || "Vídeo"),
-            public_id: video.public_id || "",
-            clipUrl: video.clipUrl || "",
-            thumbnailUrl: video.thumbnailUrl || "",
-            timestamp: Number(video.timestamp || Date.now()),
-            isNew: Boolean(video.isNew),
-          }))
-        : [];
-    }
-  } catch (error) {
-    console.error("Erro ao carregar vídeos salvos:", error);
-  }
-};
-
-const saveSavedVideos = () => {
-  localStorage.setItem(storageKeys.savedVideos, JSON.stringify(app.savedVideos));
-};
-
 const renderSavedVideos = () => {
   if (!app.savedVideos.length) {
     el.savedVideosList.innerHTML =
@@ -814,7 +737,7 @@ const playSavedVideo = (videoId) => {
       app.currentVideoId = targetVideo.id;
       if (targetVideo.isNew) {
         targetVideo.isNew = false;
-        saveSavedVideos();
+        saveSavedVideos(app);
       }
       const label = targetVideo.name;
       setCurrentVideoTitle(label);
@@ -865,7 +788,7 @@ const deleteSelectedVideos = async () => {
 
   app.savedVideos = app.savedVideos.filter((v) => !app.selectedVideoIds.includes(v.id));
   app.selectedVideoIds = [];
-  saveSavedVideos();
+  saveSavedVideos(app);
   renderSavedVideos();
   updateVideoToolbarState();
 };
@@ -892,7 +815,7 @@ const createPrompt = async () => {
   });
 
   syncActiveConfigWithPromptSelection();
-  savePromptState();
+  savePromptState(app);
   renderPromptUI();
   clearPromptEditor();
 };
@@ -918,7 +841,7 @@ const updatePrompt = async () => {
   targetPrompt.title = titleRaw || targetPrompt.title || "Prompt sem título";
   targetPrompt.text = text;
 
-  savePromptState();
+  savePromptState(app);
   renderPromptUI();
   clearPromptEditor();
 };
@@ -940,7 +863,7 @@ const createConfig = async () => {
 
   if (existingConfig) {
     app.activeConfigId = existingConfig.id;
-    savePromptState();
+    savePromptState(app);
     renderPromptUI();
 
     const decision = await showCustomDialog({
@@ -971,7 +894,7 @@ const createConfig = async () => {
 
   app.activeConfigId = configId;
 
-  savePromptState();
+  savePromptState(app);
   renderConfigList();
 };
 
@@ -991,7 +914,7 @@ const saveCurrentSelectionToConfig = async (configId) => {
 
   targetConfig.promptIds = [...activePromptIds];
   app.activeConfigId = targetConfig.id;
-  savePromptState();
+  savePromptState(app);
   renderConfigList();
 };
 
@@ -1007,7 +930,7 @@ const applyConfig = (configId) => {
   });
 
   app.activeConfigId = targetConfig.id;
-  savePromptState();
+  savePromptState(app);
   renderPromptUI();
 };
 
@@ -1017,7 +940,7 @@ const deactivateConfig = () => {
     prompt.active = false;
   });
 
-  savePromptState();
+  savePromptState(app);
   renderPromptUI();
 };
 
@@ -1044,7 +967,7 @@ const clearAllPrompts = async () => {
   app.activeConfigId = null;
   app.editingPromptId = null;
 
-  savePromptState();
+  savePromptState(app);
   renderPromptUI();
   clearPromptEditor();
 };
@@ -1061,7 +984,7 @@ const clearAllConfigs = async () => {
   app.promptConfigs = [];
   app.activeConfigId = null;
 
-  savePromptState();
+  savePromptState(app);
   renderConfigList();
 };
 
@@ -1174,8 +1097,8 @@ initTheme({
   },
 });
 renderApiMask();
-loadPromptState();
-loadSavedVideos();
+loadPromptState(app);
+loadSavedVideos(app);
 renderPromptUI();
 renderSavedVideos();
 clearPromptEditor();
@@ -1342,7 +1265,7 @@ el.promptList.addEventListener("click", async (event) => {
     if (targetPrompt) {
       targetPrompt.active = !targetPrompt.active;
       syncActiveConfigWithPromptSelection();
-      savePromptState();
+      savePromptState(app);
       renderPromptUI();
     }
     return;
@@ -1372,7 +1295,7 @@ el.promptList.addEventListener("click", async (event) => {
       const newName = input.value.trim();
       if (newName && newName !== originalName) {
         targetPrompt.title = newName;
-        savePromptState();
+        savePromptState(app);
       }
       renderPromptUI();
     };
@@ -1431,7 +1354,7 @@ el.promptList.addEventListener("click", async (event) => {
     }
 
     syncActiveConfigWithPromptSelection();
-    savePromptState();
+    savePromptState(app);
     renderPromptUI();
     return;
   }
@@ -1444,7 +1367,7 @@ el.promptList.addEventListener("click", async (event) => {
     if (targetPrompt) {
       targetPrompt.active = !targetPrompt.active;
       syncActiveConfigWithPromptSelection();
-      savePromptState();
+      savePromptState(app);
       renderPromptUI();
     }
   }
@@ -1480,7 +1403,7 @@ el.promptConfigList.addEventListener("click", async (event) => {
       const newName = input.value.trim();
       if (newName && newName !== originalName) {
         targetConfig.name = newName;
-        savePromptState();
+        savePromptState(app);
       }
       renderConfigList();
     };
@@ -1516,7 +1439,7 @@ el.promptConfigList.addEventListener("click", async (event) => {
       app.activeConfigId = null;
     }
 
-    savePromptState();
+    savePromptState(app);
     renderConfigList();
     return;
   }
@@ -1788,7 +1711,7 @@ el.savedVideosList.addEventListener("click", async (event) => {
       const newName = input.value.trim();
       if (newName && newName !== originalName) {
         video.name = newName;
-        saveSavedVideos();
+        saveSavedVideos(app);
       }
       renderSavedVideos();
     };
@@ -1822,7 +1745,7 @@ el.savedVideosList.addEventListener("click", async (event) => {
       app.latestUploadedVideoId = null;
       hideSuccessJumpBar();
     }
-    saveSavedVideos();
+    saveSavedVideos(app);
     renderSavedVideos();
     return;
   }
