@@ -3,6 +3,17 @@
   DESCRICAO: Script principal para funcionalidades do site viral-cutter-ai.
 */
 
+import {
+  clamp,
+  generateId,
+  escapeHTML,
+  truncateText,
+  truncatePromptTitle,
+  truncateSavedPromptTitle,
+  truncateVideoTitle,
+  truncatePlayerVideoTitle,
+} from "./utils.js";
+
 const el = {
   root: document.documentElement,
   body: document.body,
@@ -81,8 +92,6 @@ const storageKeys = {
   activeConfigId: "clipmaker-active-config-id-v1",
   savedVideos: "clipmaker-saved-videos-v1",
 };
-
-const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 const updateStatus = (message, loading = false) => {
   el.status.textContent = message;
@@ -236,66 +245,6 @@ const getWidgetStyles = () => {
       sourceBg: "#082f49",
     },
   };
-};
-
-const generateId = (prefix) => `${prefix}_${Date.now()}_${Math.floor(Math.random() * 100000)}`;
-
-const escapeHTML = (value) =>
-  value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
-const truncateText = (text, maxLength = 65) => {
-  const trimmed = text.replace(/\s+/g, " ").trim();
-  if (trimmed.length > maxLength) {
-    return trimmed.substring(0, maxLength) + "...";
-  }
-  return trimmed;
-};
-
-const truncatePromptTitle = (text) => {
-  const isMobile = window.innerWidth < 768;
-  const maxLength = isMobile ? 23 : 100;
-  const trimmed = text.replace(/\s+/g, " ").trim();
-  if (trimmed.length > maxLength) {
-    return trimmed.substring(0, maxLength) + "...";
-  }
-  return trimmed;
-};
-
-const truncateSavedPromptTitle = (text) => {
-  const isMobile = window.innerWidth < 768;
-  const maxLength = isMobile ? 16 : 100;
-  const trimmed = text.replace(/\s+/g, " ").trim();
-  if (trimmed.length > maxLength) {
-    return trimmed.substring(0, maxLength) + "...";
-  }
-  return trimmed;
-};
-
-const truncateVideoTitle = (text) => {
-  const trimmed = String(text || "")
-    .replace(/\s+/g, " ")
-    .trim();
-  const maxLength = clamp(Math.floor((window.innerWidth - 92) / 7.1), 18, 52);
-  if (trimmed.length > maxLength) {
-    return trimmed.substring(0, maxLength) + "...";
-  }
-  return trimmed;
-};
-
-const truncatePlayerVideoTitle = (text) => {
-  const trimmed = String(text || "")
-    .replace(/\s+/g, " ")
-    .trim();
-  const maxLength = clamp(Math.floor((window.innerWidth - 72) / 6.9), 34, 110);
-  if (trimmed.length > maxLength) {
-    return trimmed.substring(0, maxLength) + "...";
-  }
-  return trimmed;
 };
 
 const setCurrentVideoTitle = (title = "") => {

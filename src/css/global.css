@@ -1,4 +1,17 @@
-﻿html {
+﻿/* ---------------------------------------------------------
+   PREVENÇÃO DE FOUC (Flash of Unstyled Content)
+   Garante que o site só apareça após o processamento do Tailwind
+   --------------------------------------------------------- */
+body {
+  opacity: 0;
+}
+
+.ready body {
+  opacity: 1;
+  transition: opacity 0s ease-in;
+}
+
+html {
   scroll-behavior: smooth;
 }
 
