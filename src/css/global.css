@@ -1178,7 +1178,8 @@ html.dark .saved-video-item.selected {
 
 .saved-video-close-btn {
   position: absolute;
-  top: 0.45rem;
+  top: auto;
+  bottom: 0.45rem;
   right: 0.45rem;
   z-index: 12;
   width: 1.45rem;
@@ -1354,9 +1355,9 @@ html.dark .saved-videos-grid::-webkit-scrollbar-thumb:hover {
 
 .saved-video-new-badge {
   position: absolute;
-  top: 0.5rem;
-  left: 0.5rem;
-  right: auto;
+  top: 0.45rem;
+  right: 0.45rem;
+  left: auto;
   background: #10b981;
   color: #f0fdf4;
   padding: 0.25rem 0.5rem;
@@ -1366,6 +1367,9 @@ html.dark .saved-videos-grid::-webkit-scrollbar-thumb:hover {
   letter-spacing: 0.05em;
   text-transform: uppercase;
   z-index: 10;
+}
+
+.saved-video-new-badge-animate {
   animation: slideInLeft 0.3s ease;
 }
 

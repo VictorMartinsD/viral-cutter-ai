@@ -76,6 +76,7 @@ const app = {
   isVideoSelectionMode: false,
   currentVideoId: null,
   latestUploadedVideoId: null,
+  newBadgeAnimationPendingId: null,
   isSuccessJumpBarVisible: false,
   dialogResolver: null,
   dialogIsClosing: false,
@@ -703,8 +704,10 @@ const renderSavedVideos = () => {
   }
 
   el.savedVideosList.innerHTML = app.savedVideos
-    .map(
-      (video) => `
+    .map((video) => {
+      const shouldAnimateNewBadge = video.isNew && app.newBadgeAnimationPendingId === video.id;
+
+      return `
       <div class="saved-video-item ${app.selectedVideoIds.includes(video.id) ? "selected" : ""} ${app.currentVideoId === video.id ? "is-current" : ""}" data-video-id="${escapeHTML(video.id)}">
         <div class="saved-video-thumbnail">
           <img class="saved-video-thumb-img" src="${escapeHTML(getCloudinaryThumb(video))}" alt="Miniatura de ${escapeHTML(video.name)}" loading="lazy" />
@@ -714,13 +717,16 @@ const renderSavedVideos = () => {
             </span>
           </div>
           <button type="button" class="saved-video-close-btn" data-video-delete-id="${escapeHTML(video.id)}" title="Excluir">×</button>
-          ${video.isNew ? '<div class="saved-video-new-badge">NOVO</div>' : ""}
+          ${video.isNew ? `<div class="saved-video-new-badge${shouldAnimateNewBadge ? " saved-video-new-badge-animate" : ""}">NOVO</div>` : ""}
           ${app.isVideoSelectionMode ? '<div class="saved-video-checkbox"></div>' : ""}
         </div>
         <p class="saved-video-title" title="${escapeHTML(video.name)}" data-video-title-id="${escapeHTML(video.id)}">${escapeHTML(video.name)}</p>
-      </div>`,
-    )
+      </div>`;
+    })
     .join("");
+
+  app.newBadgeAnimationPendingId = null;
+
   lucide.createIcons();
   updateVideoToolbarState();
 };
