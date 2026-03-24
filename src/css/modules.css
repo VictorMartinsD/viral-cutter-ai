@@ -763,6 +763,9 @@ html.dark .prompt-config-scroll::-webkit-scrollbar-thumb {
   box-shadow:
     0 0 0 2px rgba(56, 189, 248, 0.22),
     0 14px 24px rgba(14, 165, 233, 0.18);
+}
+
+.saved-video-item.is-current.highlight-enter {
   animation: current-highlight-appear 0.6s ease-out forwards;
 }
 
@@ -771,6 +774,9 @@ html.dark .saved-video-item.is-current {
   box-shadow:
     0 0 0 2px rgba(56, 189, 248, 0.35),
     0 14px 24px rgba(14, 165, 233, 0.28);
+}
+
+html.dark .saved-video-item.is-current.highlight-enter {
   animation: current-highlight-appear-dark 0.6s ease-out forwards;
 }
 
@@ -782,12 +788,18 @@ html.dark .saved-video-item {
 .saved-video-item.selected {
   border-color: rgba(34, 197, 94, 0.7);
   background: rgba(220, 252, 231, 0.55);
+}
+
+.saved-video-item.selected.highlight-enter {
   animation: video-highlight-appear 0.6s ease-out forwards;
 }
 
 html.dark .saved-video-item.selected {
   border-color: rgba(74, 222, 128, 0.7);
   background: rgba(20, 83, 45, 0.35);
+}
+
+html.dark .saved-video-item.selected.highlight-enter {
   animation: video-highlight-appear-dark 0.6s ease-out forwards;
 }
 

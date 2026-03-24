@@ -702,7 +702,10 @@ const renderPromptUI = ({ highlightPromptIds = [], highlightConfigIds = [] } = {
   el.clearAllPromptsBtn.disabled = app.prompts.length === 0;
 };
 
-const renderSavedVideos = () => {
+const renderSavedVideos = ({ highlightSelectedVideoIds = [], highlightCurrentVideoIds = [] } = {}) => {
+  const highlightSelectedVideoIdSet = new Set(highlightSelectedVideoIds);
+  const highlightCurrentVideoIdSet = new Set(highlightCurrentVideoIds);
+
   if (!app.savedVideos.length) {
     el.savedVideosList.innerHTML =
       '<p class="col-span-full rounded-xl border border-dashed border-zinc-300 p-3 text-xs text-slate-600 dark:border-zinc-700 dark:text-zinc-400 cursor-pointer" data-scroll-to-api-key>Nenhum vídeo salvo ainda. Carregue um vídeo para começar!</p>';
@@ -726,9 +729,13 @@ const renderSavedVideos = () => {
   el.savedVideosList.innerHTML = app.savedVideos
     .map((video) => {
       const shouldAnimateNewBadge = video.isNew && app.newBadgeAnimationPendingId === video.id;
+      const isSelected = app.selectedVideoIds.includes(video.id);
+      const isCurrent = app.currentVideoId === video.id;
+      const highlightSelectedClass = isSelected && highlightSelectedVideoIdSet.has(video.id) ? " highlight-enter" : "";
+      const highlightCurrentClass = isCurrent && highlightCurrentVideoIdSet.has(video.id) ? " highlight-enter" : "";
 
       return `
-      <div class="saved-video-item ${app.selectedVideoIds.includes(video.id) ? "selected" : ""} ${app.currentVideoId === video.id ? "is-current" : ""}" data-video-id="${escapeHTML(video.id)}">
+      <div class="saved-video-item ${isSelected ? `selected${highlightSelectedClass}` : ""} ${isCurrent ? `is-current${highlightCurrentClass}` : ""}" data-video-id="${escapeHTML(video.id)}">
         <div class="saved-video-thumbnail">
           <img class="saved-video-thumb-img" src="${escapeHTML(getCloudinaryThumb(video))}" alt="Miniatura de ${escapeHTML(video.name)}" loading="lazy" />
           <div class="saved-video-overlay">
@@ -769,6 +776,7 @@ const playSavedVideo = (videoId) => {
   scrollToVideoFrame();
 
   setVideoFrameLoading(true);
+  const previousCurrentVideoId = app.currentVideoId;
   el.video.addEventListener(
     "loadeddata",
     () => {
@@ -780,7 +788,8 @@ const playSavedVideo = (videoId) => {
       }
       const label = targetVideo.name;
       setCurrentVideoTitle(label);
-      renderSavedVideos();
+      const highlightCurrentVideoIds = previousCurrentVideoId !== targetVideo.id ? [targetVideo.id] : [];
+      renderSavedVideos({ highlightCurrentVideoIds });
     },
     { once: true },
   );
@@ -1747,13 +1756,15 @@ el.savedVideosSelectAll.addEventListener("click", () => {
     return;
   }
 
+  const previousSelectedVideoIds = [...app.selectedVideoIds];
   if (!app.isVideoSelectionMode) {
     app.isVideoSelectionMode = true;
   }
 
   app.selectedVideoIds = app.savedVideos.map((v) => v.id);
+  const highlightSelectedVideoIds = getNewlyActivatedIds(previousSelectedVideoIds, app.selectedVideoIds);
   updateVideoToolbarState();
-  renderSavedVideos();
+  renderSavedVideos({ highlightSelectedVideoIds });
 });
 el.savedVideosDeselectAll.addEventListener("click", () => {
   if (!app.isVideoSelectionMode || el.savedVideosDeselectAll.disabled) {
@@ -1893,11 +1904,15 @@ el.savedVideosList.addEventListener("click", async (event) => {
 
   if (app.selectedVideoIds.includes(videoId)) {
     app.selectedVideoIds = app.selectedVideoIds.filter((id) => id !== videoId);
+    updateVideoToolbarState();
+    renderSavedVideos();
   } else {
+    const previousSelectedVideoIds = [...app.selectedVideoIds];
     app.selectedVideoIds.push(videoId);
+    const highlightSelectedVideoIds = getNewlyActivatedIds(previousSelectedVideoIds, app.selectedVideoIds);
+    updateVideoToolbarState();
+    renderSavedVideos({ highlightSelectedVideoIds });
   }
-  updateVideoToolbarState();
-  renderSavedVideos();
 });
 
 let scrollDebounce;
