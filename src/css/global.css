@@ -1,4 +1,6 @@
-﻿/* ---------------------------------------------------------
+﻿@import url(base.css);
+
+/* ---------------------------------------------------------
    PREVENÇÃO DE FOUC (Flash of Unstyled Content)
    Garante que o site só apareça após o processamento do Tailwind
    --------------------------------------------------------- */
@@ -9,23 +11,6 @@ body {
 .ready body {
   opacity: 1;
   transition: opacity 0s ease-in;
-}
-
-html {
-  scroll-behavior: smooth;
-}
-
-body {
-  background-color: #f1f5f9;
-}
-
-html.dark body {
-  background-color: #050505;
-}
-
-:root {
-  --state-transition-duration: 0.22s;
-  --state-transition-ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .premium-background {
@@ -258,15 +243,6 @@ html.dark .video-loading::before {
   );
 }
 
-@keyframes video-scan {
-  from {
-    transform: translateX(130%);
-  }
-  to {
-    transform: translateX(-150%);
-  }
-}
-
 #status.status-loading::after {
   content: "";
   display: inline-block;
@@ -376,12 +352,6 @@ html.dark .success-jump-bar:hover {
 @media (max-width: 789px) {
   .success-jump-bar {
     display: none;
-  }
-}
-
-@keyframes status-spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 
@@ -1373,17 +1343,6 @@ html.dark .saved-videos-grid::-webkit-scrollbar-thumb:hover {
   animation: slideInLeft 0.3s ease;
 }
 
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
 .saved-video-delete-btn:disabled {
   opacity: 0.4;
   cursor: not-allowed;
@@ -1851,16 +1810,4 @@ html.dark .saved-video-select-btn.active {
   background-image: linear-gradient(120deg, #34d399 0%, #22d3ee 35%, #60a5fa 70%, #34d399 100%);
   background-size: 300% 300%;
   animation: hero-gradient-flow 3.8s linear infinite;
-}
-
-@keyframes hero-gradient-flow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
 }

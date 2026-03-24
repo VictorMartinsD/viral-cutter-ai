@@ -1,2 +1,12 @@
 @import url(reset.css);
+
+/* ---------------------------------------------------------
+	 PREVENÇÃO DE FOUC (Flash of Unstyled Content)
+	 Garante que o site só apareça após o processamento do Tailwind
+	 --------------------------------------------------------- */
+body {
+  opacity: 0;
+}
+
+@import url(base.css);
 @import url(global.css);
