@@ -508,10 +508,20 @@ const showAlertDialog = (message, options = {}) =>
     isAlert: true,
   });
 
-const openPromptPanel = () => {
+const openPromptPanel = ({ onOpened } = {}) => {
+  const isAlreadyOpen = !el.promptPanel.classList.contains("hidden");
+
   gsap.killTweensOf(el.promptPanel);
   el.promptPanel.classList.remove("hidden");
   el.openPromptPanel.setAttribute("aria-expanded", "true");
+
+  if (isAlreadyOpen) {
+    gsap.set(el.promptPanel, { height: "auto", autoAlpha: 1, y: 0 });
+    if (typeof onOpened === "function") {
+      onOpened();
+    }
+    return;
+  }
 
   gsap.fromTo(
     el.promptPanel,
@@ -524,6 +534,9 @@ const openPromptPanel = () => {
       ease: "power2.out",
       onComplete: () => {
         el.promptPanel.style.height = "auto";
+        if (typeof onOpened === "function") {
+          onOpened();
+        }
       },
     },
   );
@@ -1323,8 +1336,21 @@ el.promptList.addEventListener("click", async (event) => {
     el.promptTextInput.value = targetPrompt.text;
     el.promptTextInput.setAttribute("rows", "10");
     el.savePromptBtn.textContent = "Atualizar prompt";
-    openPromptPanel();
-    el.promptTextInput.focus();
+
+    openPromptPanel({
+      onOpened: () => {
+        if (window.innerWidth < 1024) {
+          gsap.to(window, {
+            scrollTo: { y: "#promptEditorContainer", offsetY: 20 },
+            duration: 0.5,
+            ease: "power2.out",
+          });
+        }
+
+        el.promptTextInput.focus({ preventScroll: true });
+      },
+    });
+
     return;
   }
 

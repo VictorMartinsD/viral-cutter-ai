@@ -148,7 +148,7 @@ export const processWidgetResult = async (error, result, context) => {
         app.savedVideos = app.savedVideos.map((video) => ({ ...video, isNew: false }));
         app.savedVideos.unshift(newVideo);
         app.currentVideoId = newVideo.id;
-        saveSavedVideos();
+        saveSavedVideos(app);
         renderSavedVideos();
         handleUploadSuccessFeedback(newVideo.id);
       },
