@@ -574,6 +574,11 @@ const pulsePromptEditorContainer = () => {
   el.promptEditorContainer.classList.add("prompt-editor-pulse");
 };
 
+const getNewlyActivatedIds = (previousIds = [], currentIds = []) => {
+  const previousSet = new Set(previousIds);
+  return currentIds.filter((id) => !previousSet.has(id));
+};
+
 const showPromptExamples = () => {
   gsap.killTweensOf(el.promptExamples);
   el.promptExamples.classList.remove("hidden");
@@ -618,7 +623,9 @@ const hidePromptExamples = () => {
   lucide.createIcons();
 };
 
-const renderPromptList = () => {
+const renderPromptList = ({ highlightPromptIds = [] } = {}) => {
+  const highlightPromptIdSet = new Set(highlightPromptIds);
+
   if (!app.prompts.length) {
     const emptyPromptText = isMobileViewport()
       ? "Nenhum prompt salvo ainda. Crie o primeiro no campo acima."
@@ -632,7 +639,7 @@ const renderPromptList = () => {
   el.promptList.innerHTML = app.prompts
     .map(
       (prompt) => `
-      <article class="prompt-item ${prompt.active ? "is-active" : ""}" data-prompt-id="${escapeHTML(prompt.id)}">
+      <article class="prompt-item ${prompt.active ? `is-active${highlightPromptIdSet.has(prompt.id) ? " highlight-enter" : ""}` : ""}" data-prompt-id="${escapeHTML(prompt.id)}">
         ${prompt.active ? '<span class="prompt-active-badge">✓</span>' : ""}
         <div class="prompt-item-header">
           <span class="prompt-item-title" data-prompt-rename-id="${escapeHTML(prompt.id)}" title="${escapeHTML(prompt.title)}">${escapeHTML(prompt.title)}</span>
@@ -652,7 +659,9 @@ const renderPromptList = () => {
     .join("");
 };
 
-const renderConfigList = () => {
+const renderConfigList = ({ highlightConfigIds = [] } = {}) => {
+  const highlightConfigIdSet = new Set(highlightConfigIds);
+
   if (!app.promptConfigs.length) {
     el.promptConfigList.innerHTML =
       '<p class="config-empty-state col-span-full rounded-xl border border-dashed border-zinc-300 p-3 text-xs text-slate-600 dark:border-zinc-700 dark:text-zinc-400">Nenhuma configuração criada. Salve combinações para reutilizar em vários uploads.</p>';
@@ -671,7 +680,7 @@ const renderConfigList = () => {
       const subtitleText = `${promptCount} prompt(s) nesta configuração`;
 
       return `
-        <article class="config-card ${isCurrent ? "is-active" : ""}" data-config-id="${escapeHTML(cfg.id)}">
+        <article class="config-card ${isCurrent ? `is-active${highlightConfigIdSet.has(cfg.id) ? " highlight-enter" : ""}` : ""}" data-config-id="${escapeHTML(cfg.id)}">
           ${isCurrent ? '<span class="config-active-badge">✓</span>' : ""}
           <div class="config-title config-title-editable" data-config-edit-inline="${escapeHTML(cfg.id)}" title="${escapeHTML(cfg.name)}">${escapeHTML(cfg.name)}</div>
           <p class="config-subtitle" title="${escapeHTML(promptTitles.join("\n") || "Sem prompts nesta configuração")}">${escapeHTML(subtitleText)}</p>
@@ -687,9 +696,9 @@ const renderConfigList = () => {
     .join("");
 };
 
-const renderPromptUI = () => {
-  renderPromptList();
-  renderConfigList();
+const renderPromptUI = ({ highlightPromptIds = [], highlightConfigIds = [] } = {}) => {
+  renderPromptList({ highlightPromptIds });
+  renderConfigList({ highlightConfigIds });
   el.clearAllPromptsBtn.disabled = app.prompts.length === 0;
 };
 
@@ -892,9 +901,13 @@ const createConfig = async () => {
   );
 
   if (existingConfig) {
+    const previousActiveConfigId = app.activeConfigId;
+
     app.activeConfigId = existingConfig.id;
     savePromptState(app);
-    renderPromptUI();
+    const highlightConfigIds =
+      app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
+    renderPromptUI({ highlightConfigIds });
 
     const decision = await showCustomDialog({
       title: "Configuração já existente",
@@ -922,10 +935,13 @@ const createConfig = async () => {
     promptIds: [...activePromptIds],
   });
 
+  const previousActiveConfigId = app.activeConfigId;
   app.activeConfigId = configId;
 
   savePromptState(app);
-  renderConfigList();
+  const highlightConfigIds =
+    app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
+  renderConfigList({ highlightConfigIds });
 };
 
 const saveCurrentSelectionToConfig = async (configId) => {
@@ -943,9 +959,12 @@ const saveCurrentSelectionToConfig = async (configId) => {
   }
 
   targetConfig.promptIds = [...activePromptIds];
+  const previousActiveConfigId = app.activeConfigId;
   app.activeConfigId = targetConfig.id;
   savePromptState(app);
-  renderConfigList();
+  const highlightConfigIds =
+    app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
+  renderConfigList({ highlightConfigIds });
 };
 
 const applyConfig = (configId) => {
@@ -954,6 +973,8 @@ const applyConfig = (configId) => {
     return;
   }
 
+  const previousActivePromptIds = getActivePromptIds();
+  const previousActiveConfigId = app.activeConfigId;
   const promptIdSet = new Set(targetConfig.promptIds);
   app.prompts.forEach((prompt) => {
     prompt.active = promptIdSet.has(prompt.id);
@@ -961,7 +982,13 @@ const applyConfig = (configId) => {
 
   app.activeConfigId = targetConfig.id;
   savePromptState(app);
-  renderPromptUI();
+
+  const currentActivePromptIds = getActivePromptIds();
+  const highlightPromptIds = getNewlyActivatedIds(previousActivePromptIds, currentActivePromptIds);
+  const highlightConfigIds =
+    app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
+
+  renderPromptUI({ highlightPromptIds, highlightConfigIds });
 };
 
 const deactivateConfig = () => {
@@ -1169,11 +1196,18 @@ gsap.utils.toArray(".reveal").forEach((item, index) => {
   );
 });
 
+let hasBenefitsHighlightPlayed = false;
+
 ScrollTrigger.create({
   trigger: "#beneficios",
   start: "top 70%",
   once: true,
   onEnter: () => {
+    if (hasBenefitsHighlightPlayed) {
+      return;
+    }
+
+    hasBenefitsHighlightPlayed = true;
     gsap.fromTo(
       ".benefit-word",
       { y: 40, autoAlpha: 0 },
@@ -1293,10 +1327,19 @@ el.promptList.addEventListener("click", async (event) => {
   if (toggleId) {
     const targetPrompt = app.prompts.find((prompt) => prompt.id === toggleId);
     if (targetPrompt) {
+      const previousActivePromptIds = getActivePromptIds();
+      const previousActiveConfigId = app.activeConfigId;
+
       targetPrompt.active = !targetPrompt.active;
       syncActiveConfigWithPromptSelection();
       savePromptState(app);
-      renderPromptUI();
+
+      const currentActivePromptIds = getActivePromptIds();
+      const highlightPromptIds = getNewlyActivatedIds(previousActivePromptIds, currentActivePromptIds);
+      const highlightConfigIds =
+        app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
+
+      renderPromptUI({ highlightPromptIds, highlightConfigIds });
     }
     return;
   }
@@ -1413,10 +1456,19 @@ el.promptList.addEventListener("click", async (event) => {
     const promptId = articleElement.getAttribute("data-prompt-id");
     const targetPrompt = app.prompts.find((prompt) => prompt.id === promptId);
     if (targetPrompt) {
+      const previousActivePromptIds = getActivePromptIds();
+      const previousActiveConfigId = app.activeConfigId;
+
       targetPrompt.active = !targetPrompt.active;
       syncActiveConfigWithPromptSelection();
       savePromptState(app);
-      renderPromptUI();
+
+      const currentActivePromptIds = getActivePromptIds();
+      const highlightPromptIds = getNewlyActivatedIds(previousActivePromptIds, currentActivePromptIds);
+      const highlightConfigIds =
+        app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
+
+      renderPromptUI({ highlightPromptIds, highlightConfigIds });
     }
   }
 });

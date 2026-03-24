@@ -79,9 +79,9 @@ html.dark .video-loading::before {
   position: relative;
   cursor: pointer;
   transition:
-    background-color var(--state-transition-duration) var(--state-transition-ease),
-    box-shadow var(--state-transition-duration) var(--state-transition-ease),
-    border-color var(--state-transition-duration) var(--state-transition-ease);
+    background-color 0.6s ease-out,
+    border-color 0.6s ease-out,
+    box-shadow 0.6s ease-out;
 }
 
 html.dark .prompt-item {
@@ -97,12 +97,20 @@ html.dark .prompt-item {
     0 10px 20px rgba(16, 185, 129, 0.15);
 }
 
+.prompt-item.is-active.highlight-enter {
+  animation: highlight-appear 0.6s ease-out forwards;
+}
+
 html.dark .prompt-item.is-active {
   border-color: rgba(74, 222, 128, 0.7);
   background: rgba(20, 83, 45, 0.35);
   box-shadow:
     inset 0 1px 0 rgba(134, 239, 172, 0.18),
     0 10px 22px rgba(34, 197, 94, 0.18);
+}
+
+html.dark .prompt-item.is-active.highlight-enter {
+  animation: highlight-appear-dark 0.6s ease-out forwards;
 }
 
 .prompt-active-badge {
@@ -228,6 +236,174 @@ html.dark #promptEditorContainer {
   }
 }
 
+/* Animações para borda/luz aparecer e desaparecer gradualmente */
+@keyframes highlight-appear {
+  0% {
+    border-color: rgba(34, 197, 94, 0);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0),
+      0 10px 20px rgba(16, 185, 129, 0);
+  }
+  100% {
+    border-color: rgba(34, 197, 94, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 10px 20px rgba(16, 185, 129, 0.15);
+  }
+}
+
+@keyframes highlight-disappear {
+  0% {
+    border-color: rgba(34, 197, 94, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.4),
+      0 10px 20px rgba(16, 185, 129, 0.15);
+  }
+  100% {
+    border-color: rgba(34, 197, 94, 0);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0),
+      0 10px 20px rgba(16, 185, 129, 0);
+  }
+}
+
+/* Dark mode versions */
+@keyframes highlight-appear-dark {
+  0% {
+    border-color: rgba(74, 222, 128, 0);
+    box-shadow:
+      inset 0 1px 0 rgba(134, 239, 172, 0),
+      0 10px 22px rgba(34, 197, 94, 0);
+  }
+  100% {
+    border-color: rgba(74, 222, 128, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(134, 239, 172, 0.18),
+      0 10px 22px rgba(34, 197, 94, 0.18);
+  }
+}
+
+@keyframes highlight-disappear-dark {
+  0% {
+    border-color: rgba(74, 222, 128, 0.7);
+    box-shadow:
+      inset 0 1px 0 rgba(134, 239, 172, 0.18),
+      0 10px 22px rgba(34, 197, 94, 0.18);
+  }
+  100% {
+    border-color: rgba(74, 222, 128, 0);
+    box-shadow:
+      inset 0 1px 0 rgba(134, 239, 172, 0),
+      0 10px 22px rgba(34, 197, 94, 0);
+  }
+}
+
+/* Animações para video selection */
+@keyframes video-highlight-appear {
+  0% {
+    border-color: rgba(34, 197, 94, 0);
+    background: rgba(220, 252, 231, 0);
+  }
+  100% {
+    border-color: rgba(34, 197, 94, 0.7);
+    background: rgba(220, 252, 231, 0.55);
+  }
+}
+
+@keyframes video-highlight-disappear {
+  0% {
+    border-color: rgba(34, 197, 94, 0.7);
+    background: rgba(220, 252, 231, 0.55);
+  }
+  100% {
+    border-color: rgba(34, 197, 94, 0);
+    background: rgba(220, 252, 231, 0);
+  }
+}
+
+@keyframes video-highlight-appear-dark {
+  0% {
+    border-color: rgba(74, 222, 128, 0);
+    background: rgba(20, 83, 45, 0);
+  }
+  100% {
+    border-color: rgba(74, 222, 128, 0.7);
+    background: rgba(20, 83, 45, 0.35);
+  }
+}
+
+@keyframes video-highlight-disappear-dark {
+  0% {
+    border-color: rgba(74, 222, 128, 0.7);
+    background: rgba(20, 83, 45, 0.35);
+  }
+  100% {
+    border-color: rgba(74, 222, 128, 0);
+    background: rgba(20, 83, 45, 0);
+  }
+}
+
+/* Animações para vídeo atual (is-current) com borda/sombra azul */
+@keyframes current-highlight-appear {
+  0% {
+    border-color: rgba(56, 189, 248, 0);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0),
+      0 14px 24px rgba(14, 165, 233, 0);
+  }
+  100% {
+    border-color: rgba(56, 189, 248, 0.85);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0.22),
+      0 14px 24px rgba(14, 165, 233, 0.18);
+  }
+}
+
+@keyframes current-highlight-disappear {
+  0% {
+    border-color: rgba(56, 189, 248, 0.85);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0.22),
+      0 14px 24px rgba(14, 165, 233, 0.18);
+  }
+  100% {
+    border-color: rgba(56, 189, 248, 0);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0),
+      0 14px 24px rgba(14, 165, 233, 0);
+  }
+}
+
+@keyframes current-highlight-appear-dark {
+  0% {
+    border-color: rgba(125, 211, 252, 0);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0),
+      0 14px 24px rgba(14, 165, 233, 0);
+  }
+  100% {
+    border-color: rgba(125, 211, 252, 0.85);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0.35),
+      0 14px 24px rgba(14, 165, 233, 0.28);
+  }
+}
+
+@keyframes current-highlight-disappear-dark {
+  0% {
+    border-color: rgba(125, 211, 252, 0.85);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0.35),
+      0 14px 24px rgba(14, 165, 233, 0.28);
+  }
+  100% {
+    border-color: rgba(125, 211, 252, 0);
+    box-shadow:
+      0 0 0 2px rgba(56, 189, 248, 0),
+      0 14px 24px rgba(14, 165, 233, 0);
+  }
+}
+
 #clearAllPromptsBtn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
@@ -303,9 +479,9 @@ html.dark .prompt-chip-btn:hover {
   min-width: 0;
   overflow: hidden;
   transition:
-    background-color var(--state-transition-duration) var(--state-transition-ease),
-    box-shadow var(--state-transition-duration) var(--state-transition-ease),
-    border-color var(--state-transition-duration) var(--state-transition-ease);
+    background-color 0.6s ease-out,
+    border-color 0.6s ease-out,
+    box-shadow 0.6s ease-out;
 }
 
 html.dark .config-card {
@@ -418,12 +594,20 @@ html.dark .config-subtitle {
     0 10px 20px rgba(16, 185, 129, 0.15);
 }
 
+.config-card.is-active.highlight-enter {
+  animation: highlight-appear 0.6s ease-out forwards;
+}
+
 html.dark .config-card.is-active {
   border-color: rgba(74, 222, 128, 0.7);
   background: rgba(20, 83, 45, 0.35);
   box-shadow:
     inset 0 1px 0 rgba(134, 239, 172, 0.18),
     0 10px 22px rgba(34, 197, 94, 0.18);
+}
+
+html.dark .config-card.is-active.highlight-enter {
+  animation: highlight-appear-dark 0.6s ease-out forwards;
 }
 
 .config-active-badge {
@@ -557,9 +741,9 @@ html.dark .prompt-config-scroll::-webkit-scrollbar-thumb {
     0 0 0 0 rgba(56, 189, 248, 0),
     0 0 0 rgba(14, 165, 233, 0);
   transition:
-    background-color var(--state-transition-duration) var(--state-transition-ease),
-    border-color var(--state-transition-duration) var(--state-transition-ease),
-    box-shadow var(--state-transition-duration) var(--state-transition-ease);
+    background-color 0.6s ease-out,
+    border-color 0.6s ease-out,
+    box-shadow 0.6s ease-out;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -579,6 +763,7 @@ html.dark .prompt-config-scroll::-webkit-scrollbar-thumb {
   box-shadow:
     0 0 0 2px rgba(56, 189, 248, 0.22),
     0 14px 24px rgba(14, 165, 233, 0.18);
+  animation: current-highlight-appear 0.6s ease-out forwards;
 }
 
 html.dark .saved-video-item.is-current {
@@ -586,6 +771,7 @@ html.dark .saved-video-item.is-current {
   box-shadow:
     0 0 0 2px rgba(56, 189, 248, 0.35),
     0 14px 24px rgba(14, 165, 233, 0.28);
+  animation: current-highlight-appear-dark 0.6s ease-out forwards;
 }
 
 html.dark .saved-video-item {
@@ -596,11 +782,13 @@ html.dark .saved-video-item {
 .saved-video-item.selected {
   border-color: rgba(34, 197, 94, 0.7);
   background: rgba(220, 252, 231, 0.55);
+  animation: video-highlight-appear 0.6s ease-out forwards;
 }
 
 html.dark .saved-video-item.selected {
   border-color: rgba(74, 222, 128, 0.7);
   background: rgba(20, 83, 45, 0.35);
+  animation: video-highlight-appear-dark 0.6s ease-out forwards;
 }
 
 .saved-video-thumbnail {
