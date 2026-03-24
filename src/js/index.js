@@ -46,6 +46,7 @@ const el = {
   promptPanel: document.getElementById("promptPanel"),
   promptExamplesToggle: document.getElementById("promptExamplesToggle"),
   promptExamples: document.getElementById("promptExamples"),
+  promptEditorContainer: document.getElementById("promptEditorContainer"),
   promptTitleInput: document.getElementById("promptTitleInput"),
   promptTextInput: document.getElementById("promptTextInput"),
   savePromptBtn: document.getElementById("savePromptBtn"),
@@ -561,6 +562,16 @@ const closePromptPanel = () => {
       },
     },
   );
+};
+
+const pulsePromptEditorContainer = () => {
+  if (!el.promptEditorContainer) {
+    return;
+  }
+
+  el.promptEditorContainer.classList.remove("prompt-editor-pulse");
+  void el.promptEditorContainer.offsetWidth;
+  el.promptEditorContainer.classList.add("prompt-editor-pulse");
 };
 
 const showPromptExamples = () => {
@@ -1350,7 +1361,12 @@ el.promptList.addEventListener("click", async (event) => {
             scrollTo: { y: "#promptEditorContainer", offsetY: 20 },
             duration: 0.5,
             ease: "power2.out",
+            onComplete: () => {
+              pulsePromptEditorContainer();
+            },
           });
+        } else {
+          pulsePromptEditorContainer();
         }
 
         el.promptTextInput.focus({ preventScroll: true });
@@ -1636,13 +1652,13 @@ document.addEventListener("click", (event) => {
 
   const targetId = link.getAttribute("href").slice(1);
   const targetElement = document.getElementById(targetId);
-  
+
   if (!targetElement) {
     return;
   }
 
   event.preventDefault();
-  
+
   gsap.to(window, {
     scrollTo: {
       y: `#${targetId}`,
