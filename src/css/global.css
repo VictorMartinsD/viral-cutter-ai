@@ -1,6 +1,4 @@
-﻿@import url(base.css);
-
-/* ---------------------------------------------------------
+﻿/* ---------------------------------------------------------
    PREVENÇÃO DE FOUC (Flash of Unstyled Content)
    Garante que o site só apareça após o processamento do Tailwind
    --------------------------------------------------------- */
@@ -13,93 +11,12 @@ body {
   transition: opacity 0s ease-in;
 }
 
-.premium-background {
-  background: transparent;
-  z-index: -16;
-}
-
-html.dark .premium-background {
-  background: transparent;
-}
-
-.mesh-spot {
-  will-change: transform;
-}
-
-html:not(.dark) .mesh-spot {
-  backdrop-filter: saturate(150%) blur(100px);
-  -webkit-backdrop-filter: saturate(150%) blur(100px);
-  filter: blur(var(--mesh-blur, 60px)) saturate(200%) brightness(90%);
-  mix-blend-mode: multiply;
-}
-
-html.dark .mesh-spot {
-  backdrop-filter: blur(100px);
-  -webkit-backdrop-filter: blur(100px);
-  filter: blur(var(--mesh-blur, 100px));
-}
-
-.engineering-grid {
-  opacity: 0.25;
-  background-image: radial-gradient(circle, rgba(148, 163, 184, 1) 1px, transparent 1px);
-  background-size: 22px 22px;
-  mix-blend-mode: multiply;
-  -webkit-mask-image: radial-gradient(circle, black 40%, transparent 85%);
-  mask-image: radial-gradient(circle, black 40%, transparent 85%);
-  z-index: -15;
-}
-
-html.dark .engineering-grid {
-  opacity: 0.08;
-  background-image: radial-gradient(circle, rgba(100, 116, 139, 0.95) 1px, transparent 1px);
-  mix-blend-mode: screen;
-}
-
-.grain-overlay {
-  opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.88' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)' opacity='0.95'/%3E%3C/svg%3E");
-  background-size: 240px 240px;
-  background-repeat: repeat;
-  mix-blend-mode: multiply;
-  z-index: -14;
-}
-
-html.dark .grain-overlay {
-  mix-blend-mode: soft-light;
-}
-
 #beneficios article p {
   color: #334155;
 }
 
 html.dark #beneficios article p {
   color: #cbd5e1;
-}
-
-.hero-word,
-.benefit-word {
-  display: inline-block;
-  opacity: 0;
-  transform: translateY(40px);
-}
-
-.title-accent {
-  background: linear-gradient(135deg, #27272a 0%, #52525b 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-html.dark .title-accent {
-  background: linear-gradient(135deg, #f4f4f5 0%, #a1a1aa 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-}
-
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
 }
 
 .video-frame {
@@ -370,19 +287,6 @@ html.dark .success-jump-bar:hover {
 .cloudinary-widget,
 .cloudinary-widget * {
   scrollbar-width: none;
-}
-
-@media (pointer: fine) {
-  .deblur-on-scroll {
-    transform: translateZ(0);
-    backface-visibility: hidden;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  body.is-scrolling .deblur-on-scroll {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
 }
 
 .modal-open {
@@ -1804,10 +1708,4 @@ html.dark .saved-video-select-btn.active {
     text-align: center;
     width: 100%;
   }
-}
-
-.hero-free-btn {
-  background-image: linear-gradient(120deg, #34d399 0%, #22d3ee 35%, #60a5fa 70%, #34d399 100%);
-  background-size: 300% 300%;
-  animation: hero-gradient-flow 3.8s linear infinite;
 }
