@@ -1628,6 +1628,31 @@ document.addEventListener("click", (event) => {
   startCurrentVideoTitleEdit();
 });
 
+document.addEventListener("click", (event) => {
+  const link = event.target.closest("a[href^='#']");
+  if (!link) {
+    return;
+  }
+
+  const targetId = link.getAttribute("href").slice(1);
+  const targetElement = document.getElementById(targetId);
+  
+  if (!targetElement) {
+    return;
+  }
+
+  event.preventDefault();
+  
+  gsap.to(window, {
+    scrollTo: {
+      y: `#${targetId}`,
+      offsetY: 100,
+    },
+    duration: 0.5,
+    ease: "power2.out",
+  });
+});
+
 window.addEventListener(
   "resize",
   () => {
