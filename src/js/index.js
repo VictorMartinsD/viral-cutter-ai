@@ -334,6 +334,123 @@ const getActivePromptIds = () => app.prompts.filter((prompt) => prompt.active).m
 
 const getPromptCombinationKey = (promptIds = []) => [...new Set(promptIds)].sort().join("|");
 
+const formatConfigMsg = (name = "") => {
+  const fallbackName = "Sem nome";
+  const trimmedName = String(name || "").trim() || fallbackName;
+  const normalizedName = trimmedName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const startsWithConfiguracao = /^\s*configuracao\b/i.test(normalizedName);
+
+  if (!startsWithConfiguracao) {
+    return `Configuração "${trimmedName}"`;
+  }
+
+  const withoutPrefix = trimmedName.replace(/^\s*configura[cç][aã]o\b\s*/i, "").trim();
+  return `Configuração "${withoutPrefix || trimmedName}"`;
+};
+
+const analyzePromptDeletionImpact = (promptId) => {
+  const affectedConfigs = app.promptConfigs.filter((cfg) => cfg.promptIds.includes(promptId));
+  const affectedConfigIds = new Set(affectedConfigs.map((cfg) => cfg.id));
+
+  if (!affectedConfigs.length) {
+    return {
+      affectedConfigs,
+      orphanConfigs: [],
+      mergePairs: [],
+      configIdsToDelete: [],
+      duplicateLoserToWinnerId: new Map(),
+    };
+  }
+
+  const originalOrderById = new Map(app.promptConfigs.map((cfg, index) => [cfg.id, index]));
+  const simulatedConfigs = app.promptConfigs.map((cfg) => ({
+    ...cfg,
+    promptIds: cfg.promptIds.filter((id) => id !== promptId),
+  }));
+
+  const orphanConfigs = simulatedConfigs.filter((cfg) => affectedConfigIds.has(cfg.id) && cfg.promptIds.length < 2);
+  const orphanConfigIds = new Set(orphanConfigs.map((cfg) => cfg.id));
+
+  const survivors = simulatedConfigs.filter((cfg) => !orphanConfigIds.has(cfg.id) && cfg.promptIds.length >= 2);
+  const groupedByCombination = new Map();
+
+  survivors.forEach((cfg) => {
+    const key = getPromptCombinationKey(cfg.promptIds);
+    if (!groupedByCombination.has(key)) {
+      groupedByCombination.set(key, []);
+    }
+    groupedByCombination.get(key).push(cfg);
+  });
+
+  const mergePairs = [];
+  const duplicateLoserToWinnerId = new Map();
+
+  groupedByCombination.forEach((group) => {
+    if (group.length < 2) {
+      return;
+    }
+
+    const hasAnyAffectedConfig = group.some((cfg) => affectedConfigIds.has(cfg.id));
+    if (!hasAnyAffectedConfig) {
+      return;
+    }
+
+    const orderedGroup = [...group].sort(
+      (a, b) => (originalOrderById.get(a.id) || 0) - (originalOrderById.get(b.id) || 0),
+    );
+    const affectedInGroup = orderedGroup.filter((cfg) => affectedConfigIds.has(cfg.id));
+    const winnerConfig = affectedInGroup[0] || orderedGroup[0];
+
+    orderedGroup.forEach((candidateConfig) => {
+      if (candidateConfig.id === winnerConfig.id) {
+        return;
+      }
+
+      duplicateLoserToWinnerId.set(candidateConfig.id, winnerConfig.id);
+      mergePairs.push({
+        winnerConfig,
+        duplicateConfig: candidateConfig,
+      });
+    });
+  });
+
+  const configIdsToDelete = [...orphanConfigIds, ...duplicateLoserToWinnerId.keys()];
+
+  return {
+    affectedConfigs,
+    orphanConfigs,
+    mergePairs,
+    configIdsToDelete,
+    duplicateLoserToWinnerId,
+  };
+};
+
+const applyPromptDeletionCascade = (promptId, impact) => {
+  const configIdsToDelete = new Set(impact.configIdsToDelete);
+  const previousActiveConfigId = app.activeConfigId;
+
+  app.prompts = app.prompts.filter((prompt) => prompt.id !== promptId);
+  app.promptConfigs = app.promptConfigs
+    .map((cfg) => ({
+      ...cfg,
+      promptIds: cfg.promptIds.filter((id) => id !== promptId),
+    }))
+    .filter((cfg) => !configIdsToDelete.has(cfg.id));
+
+  if (app.editingPromptId === promptId) {
+    clearPromptEditor();
+  }
+
+  if (previousActiveConfigId && configIdsToDelete.has(previousActiveConfigId)) {
+    const remappedConfigId = impact.duplicateLoserToWinnerId.get(previousActiveConfigId) || null;
+    app.activeConfigId = remappedConfigId && !configIdsToDelete.has(remappedConfigId) ? remappedConfigId : null;
+  }
+
+  syncActiveConfigWithPromptSelection();
+  savePromptState(app);
+  renderPromptUI();
+};
+
 const syncActiveConfigWithPromptSelection = () => {
   const activePromptIds = getActivePromptIds();
   if (!activePromptIds.length) {
@@ -1435,27 +1552,53 @@ el.promptList.addEventListener("click", async (event) => {
       return;
     }
 
-    const accepted = await showConfirmDialog(`Excluir o prompt "${targetPrompt.title}"?`, {
-      title: "Excluir prompt",
-      confirmLabel: "Excluir",
+    const impact = analyzePromptDeletionImpact(deleteId);
+    const warningLines = [];
+
+    impact.orphanConfigs.forEach((orphanConfig) => {
+      warningLines.push(
+        `⚠️ Esta ação excluirá a ${formatConfigMsg(orphanConfig.name)}, pois ela ficará com menos de 2 prompts.`,
+      );
     });
+
+    impact.mergePairs.forEach(({ winnerConfig, duplicateConfig }) => {
+      warningLines.push(
+        `⚠️ A ${formatConfigMsg(winnerConfig.name)} será mesclada com ${formatConfigMsg(duplicateConfig.name)} por ficarem idênticas. O nome que será mantido é: "${winnerConfig.name}".`,
+      );
+    });
+
+    const commonInfoLines =
+      warningLines.length === 0
+        ? impact.affectedConfigs.map((cfg) => `Este prompt será removido da ${formatConfigMsg(cfg.name)}.`)
+        : [];
+
+    const warningBlockHTML = warningLines
+      .map((line) => `<span style="color:#dc2626;font-weight:700;">${escapeHTML(line)}</span>`)
+      .join("<br /><br />");
+    const commonInfoBlockHTML = commonInfoLines.map((line) => `<span>${escapeHTML(line)}</span>`).join("<br /><br />");
+
+    const messageSections = [`Excluir o prompt \"${escapeHTML(targetPrompt.title)}\"?`];
+    if (warningBlockHTML) {
+      messageSections.push(warningBlockHTML);
+    }
+    if (commonInfoBlockHTML) {
+      messageSections.push(commonInfoBlockHTML);
+    }
+
+    const accepted = await showCustomDialog({
+      title: "Excluir prompt",
+      message: "",
+      messageHTML: messageSections.join("<br /><br />"),
+      confirmLabel: "Excluir",
+      cancelLabel: "Cancelar",
+      isAlert: false,
+    });
+
     if (!accepted) {
       return;
     }
 
-    app.prompts = app.prompts.filter((prompt) => prompt.id !== deleteId);
-    app.promptConfigs = app.promptConfigs.map((cfg) => ({
-      ...cfg,
-      promptIds: cfg.promptIds.filter((id) => id !== deleteId),
-    }));
-
-    if (app.editingPromptId === deleteId) {
-      clearPromptEditor();
-    }
-
-    syncActiveConfigWithPromptSelection();
-    savePromptState(app);
-    renderPromptUI();
+    applyPromptDeletionCascade(deleteId, impact);
     return;
   }
 
