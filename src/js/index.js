@@ -108,15 +108,19 @@ const setVideoFrameLoading = (isLoading) => {
 
 const isWideViewportForSuccessBar = () => window.innerWidth > 789;
 
+const scrollToSelectorWithOffset = (selector, offsetY = 0) => {
+  const targetElement = document.querySelector(selector);
+  if (!targetElement) {
+    return;
+  }
+
+  const targetY = Math.max(0, window.scrollY + targetElement.getBoundingClientRect().top - offsetY);
+  // Keep smoothness in CSS (html { scroll-behavior: smooth; }) for faster native start.
+  window.scrollTo({ top: targetY });
+};
+
 const scrollToVideoFrame = () => {
-  gsap.to(window, {
-    duration: 0.72,
-    scrollTo: {
-      y: "#videoFrame",
-      offsetY: 96,
-    },
-    ease: "power2.out",
-  });
+  scrollToSelectorWithOffset("#videoFrame", 96);
 };
 
 const isNearVideoFrame = () => {
@@ -831,11 +835,7 @@ const renderSavedVideos = ({ highlightSelectedVideoIds = [], highlightCurrentVid
     const emptyMessage = el.savedVideosList.querySelector("[data-scroll-to-api-key]");
     if (emptyMessage) {
       emptyMessage.addEventListener("click", () => {
-        gsap.to(window, {
-          scrollTo: { y: "#apiKey", offsetY: 100 },
-          duration: 0.28,
-          ease: "power1.out",
-        });
+        scrollToSelectorWithOffset("#apiKey", 100);
       });
     }
 
@@ -1287,7 +1287,7 @@ renderSavedVideos();
 clearPromptEditor();
 updatePromptInputLimits();
 updatePromptTitlePlaceholder();
-gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+gsap.registerPlugin(ScrollTrigger);
 initMeshBackgroundAnimation();
 
 gsap.fromTo(
@@ -1526,14 +1526,8 @@ el.promptList.addEventListener("click", async (event) => {
     openPromptPanel({
       onOpened: () => {
         if (window.innerWidth < 1024) {
-          gsap.to(window, {
-            scrollTo: { y: "#promptEditorContainer", offsetY: 20 },
-            duration: 0.5,
-            ease: "power2.out",
-            onComplete: () => {
-              pulsePromptEditorContainer();
-            },
-          });
+          scrollToSelectorWithOffset("#promptEditorContainer", 20);
+          pulsePromptEditorContainer();
         } else {
           pulsePromptEditorContainer();
         }
@@ -1741,9 +1735,7 @@ el.securityToggle.addEventListener("click", () => {
   lucide.createIcons();
 
   if (isOpen) {
-    setTimeout(() => {
-      el.securityDetails.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }, 120);
+    el.securityDetails.scrollIntoView({ block: "nearest" });
   }
 });
 
@@ -1862,15 +1854,7 @@ document.addEventListener("click", (event) => {
   }
 
   event.preventDefault();
-
-  gsap.to(window, {
-    scrollTo: {
-      y: `#${targetId}`,
-      offsetY: 100,
-    },
-    duration: 0.5,
-    ease: "power2.out",
-  });
+  scrollToSelectorWithOffset(`#${targetId}`, 100);
 });
 
 window.addEventListener(
