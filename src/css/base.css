@@ -2,6 +2,12 @@ html {
   scroll-behavior: smooth;
 }
 
+html,
+body {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
 body {
   background-color: #f1f5f9;
 }

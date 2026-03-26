@@ -54,6 +54,7 @@ html.dark #videoNowTitle:hover {
     rgba(255, 255, 255, 0) 100%
   );
   animation: video-scan 2.5s linear infinite;
+  will-change: transform, opacity;
 }
 
 html.dark .video-loading::before {
@@ -99,6 +100,7 @@ html.dark .prompt-item {
 
 .prompt-item.is-active.highlight-enter {
   animation: highlight-appear 0.6s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 html.dark .prompt-item.is-active {
@@ -223,6 +225,7 @@ html.dark #promptEditorContainer {
 
 #promptEditorContainer.prompt-editor-pulse {
   animation: prompt-editor-soft-pulse 0.62s ease-out;
+  will-change: transform, opacity;
 }
 
 @keyframes prompt-editor-soft-pulse {
@@ -596,6 +599,7 @@ html.dark .config-subtitle {
 
 .config-card.is-active.highlight-enter {
   animation: highlight-appear 0.6s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 html.dark .config-card.is-active {
@@ -768,6 +772,7 @@ html.dark .prompt-config-scroll::-webkit-scrollbar-thumb {
 
 .saved-video-item.is-current.highlight-enter {
   animation: current-highlight-appear 0.6s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 html.dark .saved-video-item.is-current {
@@ -793,6 +798,7 @@ html.dark .saved-video-item {
 
 .saved-video-item.selected.highlight-enter {
   animation: video-highlight-appear 0.6s ease-out forwards;
+  will-change: transform, opacity;
 }
 
 html.dark .saved-video-item.selected {
@@ -1050,6 +1056,7 @@ html.dark .saved-videos-grid::-webkit-scrollbar-thumb:hover {
 
 .saved-video-new-badge-animate {
   animation: slideInLeft 0.3s ease;
+  will-change: transform, opacity;
 }
 
 .saved-video-delete-btn:disabled {

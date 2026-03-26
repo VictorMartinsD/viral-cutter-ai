@@ -88,6 +88,43 @@ const config = {
   uploadPreset: "upload_nlw",
 };
 
+const debounce = (callback, wait = 120) => {
+  let timeoutId;
+
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => {
+      callback(...args);
+    }, wait);
+  };
+};
+
+const throttle = (callback, wait = 80) => {
+  let isThrottled = false;
+  let pendingArgs = null;
+
+  return (...args) => {
+    if (isThrottled) {
+      pendingArgs = args;
+      return;
+    }
+
+    callback(...args);
+    isThrottled = true;
+
+    setTimeout(() => {
+      isThrottled = false;
+      if (!pendingArgs) {
+        return;
+      }
+
+      const nextArgs = pendingArgs;
+      pendingArgs = null;
+      callback(...nextArgs);
+    }, wait);
+  };
+};
+
 const updateStatus = (message, loading = false) => {
   el.status.textContent = message;
   el.status.classList.remove("status-loading", "status-success");
@@ -1857,25 +1894,21 @@ document.addEventListener("click", (event) => {
   scrollToSelectorWithOffset(`#${targetId}`, 100);
 });
 
-window.addEventListener(
-  "resize",
-  () => {
-    updatePromptInputLimits();
-    updatePromptTitlePlaceholder();
-  },
-  { passive: true },
-);
-window.addEventListener(
-  "resize",
-  () => {
-    renderPromptUI();
-    updateVideoToolbarState();
-    if (!isWideViewportForSuccessBar()) {
-      hideSuccessJumpBar();
-    }
-  },
-  { passive: true },
-);
+const handleResizeForPromptInputs = debounce(() => {
+  updatePromptInputLimits();
+  updatePromptTitlePlaceholder();
+}, 140);
+
+const handleResizeForPromptAndVideos = debounce(() => {
+  renderPromptUI();
+  updateVideoToolbarState();
+  if (!isWideViewportForSuccessBar()) {
+    hideSuccessJumpBar();
+  }
+}, 160);
+
+window.addEventListener("resize", handleResizeForPromptInputs, { passive: true });
+window.addEventListener("resize", handleResizeForPromptAndVideos, { passive: true });
 
 el.savedVideosSelectToggle.addEventListener("click", toggleVideoSelectionMode);
 el.savedVideosSelectAll.addEventListener("click", () => {
@@ -2043,14 +2076,12 @@ el.savedVideosList.addEventListener("click", async (event) => {
 });
 
 let scrollDebounce;
-window.addEventListener(
-  "scroll",
-  () => {
-    el.body.classList.add("is-scrolling");
-    clearTimeout(scrollDebounce);
-    scrollDebounce = setTimeout(() => {
-      el.body.classList.remove("is-scrolling");
-    }, 130);
-  },
-  { passive: true },
-);
+const handleScrollStability = throttle(() => {
+  el.body.classList.add("is-scrolling");
+  clearTimeout(scrollDebounce);
+  scrollDebounce = setTimeout(() => {
+    el.body.classList.remove("is-scrolling");
+  }, 130);
+}, 80);
+
+window.addEventListener("scroll", handleScrollStability, { passive: true });
