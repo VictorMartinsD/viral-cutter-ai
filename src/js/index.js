@@ -1,4 +1,4 @@
-﻿import { clamp, generateId, escapeHTML, truncateText, truncatePlayerVideoTitle } from "./utils.js";
+import { clamp, generateId, escapeHTML, truncateText, truncatePlayerVideoTitle } from "./utils.js";
 import { initTheme } from "./theme.js";
 import { waitForTranscription, getTranscription, getViralMoment, processWidgetResult } from "./api.js";
 import { storageKeys, savePromptState, loadPromptState, loadSavedVideos, saveSavedVideos } from "./storage.js";
@@ -1020,9 +1020,9 @@ const toggleVideoSelectionMode = () => {
 const deleteSelectedVideos = async () => {
   if (!app.selectedVideoIds.length) return;
 
-  const accepted = await showConfirmDialog(`Deseja excluir ${app.selectedVideoIds.length} vídeo(s)?`, {
-    title: "Excluir vídeos",
-    confirmLabel: "Excluir",
+  const accepted = await showConfirmDialog(`Isto removerá ${app.selectedVideoIds.length} vídeo(s) permanentemente.`, {
+    title: "Atenção",
+    confirmLabel: "Remover",
   });
   if (!accepted) return;
 
@@ -1038,8 +1038,8 @@ const createPrompt = async () => {
   const text = el.promptTextInput.value.trim();
 
   if (!text) {
-    await showAlertDialog("Digite uma instrução para salvar o prompt.", {
-      title: "Prompt vazio",
+    await showAlertDialog("Escreva uma instrução antes de salvar.", {
+      title: "Campo obrigatório",
     });
     el.promptTextInput.focus();
     return;
@@ -1071,8 +1071,8 @@ const updatePrompt = async () => {
   const text = el.promptTextInput.value.trim();
 
   if (!text) {
-    await showAlertDialog("Digite uma instrução para salvar o prompt.", {
-      title: "Prompt vazio",
+    await showAlertDialog("Escreva uma instrução antes de salvar.", {
+      title: "Campo obrigatório",
     });
     el.promptTextInput.focus();
     return;
@@ -1090,8 +1090,8 @@ const createConfig = async () => {
   const activePromptIds = getActivePromptIds();
   if (activePromptIds.length < 2) {
     showAlertDialog("", {
-      title: "Combinação indisponível",
-      messageHTML: "Ative 2 ou mais prompts em <strong>prompts salvos</strong> para salvar uma combinação.",
+      title: "Configuração necessária",
+      messageHTML: "Ative 2+ prompts em <strong>prompts salvos</strong> para criar uma combinação.",
     });
     return;
   }
@@ -1111,9 +1111,9 @@ const createConfig = async () => {
     renderPromptUI({ highlightConfigIds });
 
     const decision = await showCustomDialog({
-      title: "Configuração já existente",
+      title: "Opção disponível",
       message: "",
-      messageHTML: `Essa combinação já existe e ela está <strong>ativada</strong>, ela está nomeada como <strong>${escapeHTML(existingConfig.name)}</strong>.<br /><br />Deseja <strong>desativar</strong> essa configuração?`,
+      messageHTML: `"<strong>${escapeHTML(existingConfig.name)}</strong>" já está ativa.<br /><br />Deseja <strong>desativar</strong> essa configuração?`,
       confirmLabel: "Desativar",
       cancelLabel: "Cancelar",
       isAlert: false,
@@ -1189,8 +1189,8 @@ const toggleConfigActivation = (configId) => {
 };
 
 const clearAllPrompts = async () => {
-  const accepted = await showConfirmDialog("Deseja realmente apagar todos os prompts salvos?", {
-    title: "Apagar prompts",
+  const accepted = await showConfirmDialog("Todos os prompts salvos serão removidos permanentemente.", {
+    title: "Atenção",
     confirmLabel: "Apagar",
   });
   if (!accepted) {
@@ -1208,8 +1208,8 @@ const clearAllPrompts = async () => {
 };
 
 const clearAllConfigs = async () => {
-  const accepted = await showConfirmDialog("Deseja realmente apagar todas as configurações salvas?", {
-    title: "Apagar configurações",
+  const accepted = await showConfirmDialog("Todas as configurações salvas serão removidas permanentemente.", {
+    title: "Atenção",
     confirmLabel: "Apagar",
   });
   if (!accepted) {
@@ -1456,9 +1456,9 @@ el.savePromptBtn.addEventListener("click", async () => {
 el.newPromptBtn.addEventListener("click", async () => {
   const hasDraft = Boolean(el.promptTitleInput.value.trim() || el.promptTextInput.value.trim());
   if (hasDraft) {
-    const accepted = await showConfirmDialog("Seu prompt não foi salvo! Deseja apagar e criar um novo?", {
-      title: "Descartar rascunho",
-      confirmLabel: "Apagar",
+    const accepted = await showConfirmDialog("O prompt não foi salvo e será perdido. Deseja continuar?", {
+      title: "Confirmação",
+      confirmLabel: "Descartar",
     });
     if (!accepted) {
       return;
@@ -1603,10 +1603,10 @@ el.promptList.addEventListener("click", async (event) => {
     }
 
     const accepted = await showCustomDialog({
-      title: "Excluir prompt",
+      title: "Confirmar ação",
       message: "",
       messageHTML: messageSections.join("<br /><br />"),
-      confirmLabel: "Excluir",
+      confirmLabel: "Remover",
       cancelLabel: "Cancelar",
       isAlert: false,
     });
@@ -1695,9 +1695,9 @@ el.promptConfigList.addEventListener("click", async (event) => {
       return;
     }
 
-    const accepted = await showConfirmDialog(`Excluir a configuração "${targetConfig.name}"?`, {
-      title: "Excluir configuração",
-      confirmLabel: "Excluir",
+    const accepted = await showConfirmDialog(`A configuração "${targetConfig.name}" será removida permanentemente.`, {
+      title: "Atenção",
+      confirmLabel: "Remover",
     });
     if (!accepted) {
       return;
@@ -1829,8 +1829,8 @@ el.apiKey.addEventListener("focus", () => {
 
 el.button.addEventListener("click", async () => {
   if (!app.apiKeyRawValue) {
-    await showAlertDialog("Por favor, insira sua API do Gemini primeiro.", {
-      title: "API ausente",
+    await showAlertDialog("Insira sua chave da API do Gemini para continuar.", {
+      title: "Configuração necessária",
       confirmLabel: "Ok",
     });
     el.apiKey.focus();
@@ -2016,9 +2016,9 @@ el.savedVideosList.addEventListener("click", async (event) => {
     const video = app.savedVideos.find((v) => v.id === videoId);
     if (!video) return;
 
-    const accepted = await showConfirmDialog(`Excluir o vídeo "${video.name}"?`, {
-      title: "Excluir vídeo",
-      confirmLabel: "Excluir",
+    const accepted = await showConfirmDialog(`"${video.name}" será removido de seus salvos permanentemente.`, {
+      title: "Atenção",
+      confirmLabel: "Remover",
     });
     if (!accepted) return;
 
