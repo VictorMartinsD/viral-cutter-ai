@@ -125,18 +125,17 @@ html.dark .aura-layer-3 {
   will-change: transform, opacity;
 }
 
-.title-accent {
-  background: linear-gradient(135deg, #27272a 0%, #52525b 100%);
+.highlight-text {
+  display: inline-block;
+  background-image: linear-gradient(to right, #1f2937 0%, #2563eb 60%, #2563eb 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+  -webkit-text-fill-color: transparent;
 }
 
-html.dark .title-accent {
-  background: linear-gradient(135deg, #f4f4f5 0%, #a1a1aa 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+html.dark .highlight-text {
+  background-image: linear-gradient(to right, #ffffff 0%, #a855f7 60%, #a855f7 100%);
 }
 
 .reveal {
