@@ -380,6 +380,59 @@ const formatConfigMsg = (name = "") => {
   return `Configuração "${withoutPrefix || trimmedName}"`;
 };
 
+const getConfigDisplayLabel = (name = "") => {
+  const fallbackName = "Sem nome";
+  const trimmedName = String(name || "").trim() || fallbackName;
+  const normalizedName = trimmedName.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  const startsWithConfiguracao = /^\s*configuracao\b/i.test(normalizedName);
+
+  if (!startsWithConfiguracao) {
+    return trimmedName;
+  }
+
+  const withoutPrefix = trimmedName.replace(/^\s*configura[cç][aã]o\b\s*/i, "").trim();
+  return withoutPrefix || trimmedName;
+};
+
+const joinWithCommasAndConjunction = (items = []) => {
+  if (!items.length) {
+    return "";
+  }
+
+  if (items.length === 1) {
+    return items[0];
+  }
+
+  if (items.length === 2) {
+    return `${items[0]} e ${items[1]}`;
+  }
+
+  return `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
+};
+
+const formatOrphanConfigsWarning = (orphanConfigs = []) => {
+  if (!orphanConfigs.length) {
+    return "";
+  }
+
+  const collator = new Intl.Collator("pt-BR", {
+    numeric: true,
+    sensitivity: "base",
+  });
+
+  const sortedUniqueQuotedLabels = [...new Set(orphanConfigs.map((cfg) => getConfigDisplayLabel(cfg.name)))]
+    .sort((a, b) => collator.compare(a, b))
+    .map((label) => `"${label}"`);
+
+  const labelsList = joinWithCommasAndConjunction(sortedUniqueQuotedLabels);
+
+  if (sortedUniqueQuotedLabels.length === 1) {
+    return `⚠️ Esta ação excluirá a configuração ${labelsList}, pois ela ficará com menos de 2 prompts.`;
+  }
+
+  return `⚠️ Esta ação excluirá as configurações ${labelsList}, pois elas ficarão com menos de 2 prompts.`;
+};
+
 const analyzePromptDeletionImpact = (promptId) => {
   const affectedConfigs = app.promptConfigs.filter((cfg) => cfg.promptIds.includes(promptId));
   const affectedConfigIds = new Set(affectedConfigs.map((cfg) => cfg.id));
@@ -1554,11 +1607,10 @@ el.promptList.addEventListener("click", async (event) => {
     const impact = analyzePromptDeletionImpact(deleteId);
     const warningLines = [];
 
-    impact.orphanConfigs.forEach((orphanConfig) => {
-      warningLines.push(
-        `⚠️ Esta ação excluirá a ${formatConfigMsg(orphanConfig.name)}, pois ela ficará com menos de 2 prompts.`,
-      );
-    });
+    const orphanWarning = formatOrphanConfigsWarning(impact.orphanConfigs);
+    if (orphanWarning) {
+      warningLines.push(orphanWarning);
+    }
 
     impact.mergePairs.forEach(({ winnerConfig, duplicateConfig }) => {
       warningLines.push(
