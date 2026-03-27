@@ -110,8 +110,7 @@ html.dark .title-accent {
 }
 
 #beneficios,
-#videoFrame,
-#playerVideoContainer {
+#videoFrame {
   transform: translateZ(0);
   backface-visibility: hidden;
 }

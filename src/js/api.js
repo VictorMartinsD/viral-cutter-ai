@@ -80,9 +80,9 @@ export const getViralMoment = async (apiKey, transcription, priorityPrompt) => {
     throw new Error(`Gemini retornou HTTP ${response.status}`);
   }
 
-  const data = await response.json();
-  const rawText = data.candidates[0].content.parts[0].text;
-  return rawText.replace(/```/g, "").replace(/json/g, "").trim();
+  const geminiResponseData = await response.json();
+  const generatedRawText = geminiResponseData.candidates[0].content.parts[0].text;
+  return generatedRawText.replace(/```/g, "").replace(/json/g, "").trim();
 };
 
 export const processWidgetResult = async (error, result, context) => {

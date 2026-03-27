@@ -3,16 +3,7 @@
   DESCRICAO: Script principal para funcionalidades do site viral-cutter-ai.
 */
 
-import {
-  clamp,
-  generateId,
-  escapeHTML,
-  truncateText,
-  truncatePromptTitle,
-  truncateSavedPromptTitle,
-  truncateVideoTitle,
-  truncatePlayerVideoTitle,
-} from "./utils.js";
+import { clamp, generateId, escapeHTML, truncateText, truncatePlayerVideoTitle } from "./utils.js";
 import { initTheme } from "./theme.js";
 import { waitForTranscription, getTranscription, getViralMoment, processWidgetResult } from "./api.js";
 import { storageKeys, savePromptState, loadPromptState, loadSavedVideos, saveSavedVideos } from "./storage.js";
@@ -1101,29 +1092,6 @@ const createConfig = async () => {
   const previousActiveConfigId = app.activeConfigId;
   app.activeConfigId = configId;
 
-  savePromptState(app);
-  const highlightConfigIds =
-    app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
-  renderConfigList({ highlightConfigIds });
-};
-
-const saveCurrentSelectionToConfig = async (configId) => {
-  const targetConfig = app.promptConfigs.find((cfg) => cfg.id === configId);
-  if (!targetConfig) {
-    return;
-  }
-
-  const activePromptIds = getActivePromptIds();
-  if (!activePromptIds.length) {
-    await showAlertDialog("Ative ao menos um prompt para salvar na configuração.", {
-      title: "Nada selecionado",
-    });
-    return;
-  }
-
-  targetConfig.promptIds = [...activePromptIds];
-  const previousActiveConfigId = app.activeConfigId;
-  app.activeConfigId = targetConfig.id;
   savePromptState(app);
   const highlightConfigIds =
     app.activeConfigId && app.activeConfigId !== previousActiveConfigId ? [app.activeConfigId] : [];
