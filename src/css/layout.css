@@ -5,10 +5,6 @@
   z-index: -16;
 }
 
-html.dark .premium-background {
-  background: transparent;
-}
-
 .mesh-spot {
   position: fixed;
   inset: 0;

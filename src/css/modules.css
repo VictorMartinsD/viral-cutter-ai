@@ -6,6 +6,8 @@ html.dark #beneficios article p {
   color: #cbd5e1;
 }
 
+/* Player */
+
 .video-frame {
   position: relative;
   overflow: hidden;
@@ -71,6 +73,8 @@ html.dark .video-loading::before {
     text-align: center;
   }
 }
+
+/* Prompts */
 
 .prompt-item {
   border: 1px solid rgba(161, 161, 170, 0.45);
@@ -654,6 +658,8 @@ html.dark .prompt-config-scroll::-webkit-scrollbar-thumb {
   background: rgba(148, 163, 184, 0.45);
 }
 
+/* Videos salvos */
+
 .saved-video-item {
   border: 1px solid rgba(161, 161, 170, 0.45);
   border-radius: 0.9rem;
@@ -781,7 +787,6 @@ html.dark .saved-video-item.selected.highlight-enter {
 
 .saved-video-close-btn {
   position: absolute;
-  top: auto;
   bottom: 0.45rem;
   right: 0.45rem;
   z-index: 12;
@@ -1099,18 +1104,6 @@ html.dark .saved-video-select-btn.active {
     line-height: 1;
   }
 
-  .prompt-item .prompt-actions [data-prompt-delete-id] {
-    border-color: rgba(253, 164, 175, 0.8);
-    background: rgba(255, 228, 230, 0.9);
-    color: #881337;
-  }
-
-  html.dark .prompt-item .prompt-actions [data-prompt-delete-id] {
-    border-color: rgba(251, 113, 133, 0.45);
-    background: rgba(190, 24, 93, 0.2);
-    color: #fecdd3;
-  }
-
   .config-toolbar {
     width: 100%;
     display: grid;
@@ -1144,18 +1137,6 @@ html.dark .saved-video-select-btn.active {
 
   .config-card .prompt-actions [data-config-toggle-id] {
     order: 1;
-  }
-
-  .config-card .prompt-actions [data-config-delete-id] {
-    border-color: rgba(253, 164, 175, 0.8);
-    background: rgba(255, 228, 230, 0.9);
-    color: #881337;
-  }
-
-  html.dark .config-card .prompt-actions [data-config-delete-id] {
-    border-color: rgba(251, 113, 133, 0.45);
-    background: rgba(190, 24, 93, 0.2);
-    color: #fecdd3;
   }
 
   .saved-videos-title {
@@ -1406,29 +1387,6 @@ html.dark .saved-video-select-btn.active {
   .prompt-config-scroll,
   .config-card {
     overflow-x: hidden;
-  }
-
-  .config-card .prompt-actions {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
-
-  .config-card .prompt-actions [data-config-toggle-id],
-  .config-card .prompt-actions [data-config-delete-id] {
-    width: 100%;
-    min-width: 0;
-    max-width: none;
-    flex-basis: auto;
-  }
-
-  .config-card .prompt-actions [data-config-delete-id] {
-    order: 2;
-  }
-
-  .config-card .prompt-actions [data-config-toggle-id] {
-    order: 1;
   }
 }
 
