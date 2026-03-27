@@ -1235,35 +1235,57 @@ const getPriorityPromptBlock = () => {
     .join("\n");
 };
 
-const openApiModal = () => {
-  gsap.killTweensOf([el.apiModalBackdrop, el.apiModalCard]);
-  el.apiModal.classList.remove("hidden");
-  el.body.classList.add("overflow-hidden");
+const { openApiModal: openApiModalFunc, closeApiModal: closeApiModalFunc } = (() => {
+  let previousFocus = null;
 
-  gsap.fromTo(el.apiModalBackdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: "power1.out" });
-  gsap.fromTo(
-    el.apiModalCard,
-    { y: 20, scale: 0.97, autoAlpha: 0 },
-    { y: 0, scale: 1, autoAlpha: 1, duration: 0.28, ease: "power2.out" },
-  );
-};
+  const openApiModal = () => {
+    previousFocus = document.activeElement;
 
-const closeApiModal = () => {
-  gsap.killTweensOf([el.apiModalBackdrop, el.apiModalCard]);
+    gsap.killTweensOf([el.apiModalBackdrop, el.apiModalCard]);
+    el.apiModal.classList.remove("hidden");
+    el.body.classList.add("overflow-hidden");
 
-  gsap.to(el.apiModalBackdrop, { autoAlpha: 0, duration: 0.18, ease: "power1.in" });
-  gsap.to(el.apiModalCard, {
-    y: 16,
-    scale: 0.97,
-    autoAlpha: 0,
-    duration: 0.22,
-    ease: "power2.in",
-    onComplete: () => {
-      el.apiModal.classList.add("hidden");
-      el.body.classList.remove("overflow-hidden");
-    },
-  });
-};
+    gsap.fromTo(el.apiModalBackdrop, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.2, ease: "power1.out" });
+    gsap.fromTo(
+      el.apiModalCard,
+      { y: 20, scale: 0.97, autoAlpha: 0 },
+      {
+        y: 0,
+        scale: 1,
+        autoAlpha: 1,
+        duration: 0.28,
+        ease: "power2.out",
+        onComplete: () => {
+          el.closeApiModal.focus();
+        },
+      },
+    );
+  };
+
+  const closeApiModal = () => {
+    gsap.killTweensOf([el.apiModalBackdrop, el.apiModalCard]);
+
+    gsap.to(el.apiModalBackdrop, { autoAlpha: 0, duration: 0.18, ease: "power1.in" });
+    gsap.to(el.apiModalCard, {
+      y: 16,
+      scale: 0.97,
+      autoAlpha: 0,
+      duration: 0.22,
+      ease: "power2.in",
+      onComplete: () => {
+        el.apiModal.classList.add("hidden");
+        el.body.classList.remove("overflow-hidden");
+        previousFocus?.focus();
+        previousFocus = null;
+      },
+    });
+  };
+
+  return { openApiModal, closeApiModal };
+})();
+
+const openApiModal = openApiModalFunc;
+const closeApiModal = closeApiModalFunc;
 
 const renderApiMask = () => {
   el.apiKey.value = "*".repeat(app.apiKeyRawValue.length);

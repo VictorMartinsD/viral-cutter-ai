@@ -31,11 +31,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="src/js/tailwind-config.js"></script>
 
-    <script src="https://unpkg.com/lucide@latest" defer></script>
+    <script src="https://unpkg.com/lucide@0.468.0" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollToPlugin.min.js" defer></script>
-    <script src="https://upload-widget.cloudinary.com/latest/global/all.js" defer></script>
+    <script src="https://upload-widget.cloudinary.com/1.13.0/global/all.js" defer></script>
 
     <script type="module" src="src/js/index.js"></script>
 
@@ -514,6 +514,9 @@
 
       <div
         id="apiModalCard"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="apiModalTitle"
         class="relative mx-auto mt-16 w-[92%] max-w-xl rounded-3xl border border-zinc-300/80 bg-zinc-100/95 p-6 shadow-soft dark:border-zinc-800/80 dark:bg-zinc-900/95 dark:shadow-mellow sm:p-7">
         <button
           id="closeApiModal"
@@ -523,7 +526,9 @@
           <i data-lucide="x" class="h-4 w-4"></i>
         </button>
 
-        <h2 class="pr-10 font-display text-2xl font-bold tracking-tight text-slate-950 dark:text-slate-50">
+        <h2
+          id="apiModalTitle"
+          class="pr-10 font-display text-2xl font-bold tracking-tight text-slate-950 dark:text-slate-50">
           Como pegar sua chave da API
         </h2>
 
