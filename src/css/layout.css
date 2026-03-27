@@ -138,6 +138,16 @@ html.dark .highlight-text {
   background-image: linear-gradient(to right, #ffffff 0%, #a855f7 60%, #a855f7 100%);
 }
 
+#beneficios,
+#benefitsTitle {
+  overflow: visible;
+}
+
+#benefitsTitle .highlight-text {
+  display: inline-block;
+  padding-bottom: 0.2em;
+}
+
 .reveal {
   opacity: 0;
   transform: translateY(24px);
