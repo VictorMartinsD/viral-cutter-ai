@@ -1,9 +1,4 @@
-﻿/*
-  AUTOR: Victor Martins
-  DESCRICAO: Script principal para funcionalidades do site viral-cutter-ai.
-*/
-
-import { clamp, generateId, escapeHTML, truncateText, truncatePlayerVideoTitle } from "./utils.js";
+﻿import { clamp, generateId, escapeHTML, truncateText, truncatePlayerVideoTitle } from "./utils.js";
 import { initTheme } from "./theme.js";
 import { waitForTranscription, getTranscription, getViralMoment, processWidgetResult } from "./api.js";
 import { storageKeys, savePromptState, loadPromptState, loadSavedVideos, saveSavedVideos } from "./storage.js";
@@ -143,7 +138,6 @@ const scrollToSelectorWithOffset = (selector, offsetY = 0) => {
   }
 
   const targetY = Math.max(0, window.scrollY + targetElement.getBoundingClientRect().top - offsetY);
-  // Keep smoothness in CSS (html { scroll-behavior: smooth; }) for faster native start.
   window.scrollTo({ top: targetY });
 };
 
@@ -912,7 +906,7 @@ const renderSavedVideos = ({ highlightSelectedVideoIds = [], highlightCurrentVid
     el.savedVideosList.innerHTML =
       '<p class="col-span-full rounded-xl border border-dashed border-zinc-300 p-3 text-xs text-slate-600 dark:border-zinc-700 dark:text-zinc-400 cursor-pointer" data-scroll-to-api-key>Nenhum vídeo salvo ainda. Carregue um vídeo para começar!</p>';
 
-    // Scroll animation on empty message click
+    // Navega direto para o campo de API quando não ha videos.
     const emptyMessage = el.savedVideosList.querySelector("[data-scroll-to-api-key]");
     if (emptyMessage) {
       emptyMessage.addEventListener("click", () => {
@@ -1653,7 +1647,7 @@ el.promptList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Click anywhere on the card (but not on buttons) to toggle
+  // Alterna o estado pelo card inteiro, preservando cliques em botoes.
   const articleElement = event.target.closest("article[data-prompt-id]");
   if (articleElement && !event.target.closest("button")) {
     const promptId = articleElement.getAttribute("data-prompt-id");
@@ -1747,7 +1741,7 @@ el.promptConfigList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Click anywhere on the card (but not on buttons) to toggle
+  // Alterna o estado pelo card inteiro, preservando cliques em controles.
   const articleElement = event.target.closest("article[class*='config-card']");
   if (articleElement && !event.target.closest("button") && !event.target.closest("input")) {
     const configId = articleElement.getAttribute("data-config-id");
@@ -2005,7 +1999,7 @@ el.savedVideosList.addEventListener("mouseout", (event) => {
 });
 
 el.savedVideosList.addEventListener("click", async (event) => {
-  // Handle video title rename
+  // Fluxo de edicao inline do titulo.
   const titleElement = event.target.closest(".saved-video-title");
   if (titleElement && !app.isVideoSelectionMode) {
     const videoId = titleElement.getAttribute("data-video-title-id");
@@ -2043,7 +2037,7 @@ el.savedVideosList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Handle individual video delete
+  // Exclusao individual com confirmacao.
   const deleteButton = event.target.closest("[data-video-delete-id]");
   if (deleteButton) {
     const videoId = deleteButton.getAttribute("data-video-delete-id");
@@ -2066,7 +2060,7 @@ el.savedVideosList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Handle video selection in selection mode
+  // Selecao em lote quando modo de selecao estiver ativo.
   const videoItem = event.target.closest(".saved-video-item");
   if (!videoItem) return;
 

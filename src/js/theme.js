@@ -20,14 +20,16 @@ const syncThemeToggle = () => {
   themeToggle.classList.toggle("text-zinc-400", isDark);
 };
 
-(function () {
+const applyStoredTheme = () => {
   const storedTheme = localStorage.getItem(themeStorageKey);
   if (!storedTheme || storedTheme === "dark") {
     document.documentElement.classList.add("dark");
   } else {
     document.documentElement.classList.remove("dark");
   }
-})();
+};
+
+applyStoredTheme();
 
 export const toggleTheme = () => {
   const { root } = getThemeElements();

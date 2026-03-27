@@ -40,9 +40,9 @@
     <script type="module" src="src/js/index.js"></script>
 
     <script>
-      function revealPage() {
+      const revealPage = () => {
         document.documentElement.classList.add("ready");
-      }
+      };
 
       if (document.readyState === "interactive" || document.readyState === "complete") {
         revealPage();
