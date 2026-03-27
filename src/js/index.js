@@ -698,7 +698,7 @@ const showConfirmDialog = (message, options = {}) =>
 
 const showAlertDialog = (message, options = {}) =>
   showCustomDialog({
-    title: options.title || "ClipMaker",
+    title: options.title || "Cutter.ai",
     message,
     messageHTML: options.messageHTML || "",
     confirmLabel: options.confirmLabel || "Entendi",
