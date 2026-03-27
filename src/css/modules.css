@@ -55,7 +55,8 @@ html.dark #videoNowTitle:hover {
     rgba(113, 113, 122, 0.2) 48%,
     rgba(255, 255, 255, 0) 100%
   );
-  animation: video-scan 2.5s linear infinite;
+  opacity: 0;
+  animation: video-scan 2.5s ease-in-out infinite;
   will-change: transform, opacity;
 }
 
@@ -146,7 +147,6 @@ html.dark .prompt-item.is-active.highlight-enter {
   font-size: 0.8rem;
   font-weight: 800;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
   color: #334155;
   min-width: 0;
   flex: 1;
@@ -418,7 +418,6 @@ html.dark .config-card {
   font-size: 0.79rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: #334155;
 }
 
@@ -459,7 +458,6 @@ html.dark .config-title-editable:hover {
   font-size: 0.79rem;
   font-weight: 800;
   letter-spacing: 0.06em;
-  text-transform: uppercase;
   color: #334155;
   background: #f8fafc;
   border: 1px solid #a1a1aa;
@@ -853,7 +851,6 @@ html.dark .saved-video-close-btn {
 .saved-video-title {
   font-size: 0.81rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #334155;
   white-space: nowrap;
@@ -889,7 +886,6 @@ html.dark .saved-video-title:hover {
 .saved-video-title-input {
   font-size: 0.81rem;
   font-weight: 700;
-  text-transform: uppercase;
   letter-spacing: 0.05em;
   color: #334155;
   background: #f8fafc;
