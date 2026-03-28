@@ -1,14 +1,9 @@
 ﻿/* ---------------------------------------------------------
    PREVENÇÃO DE FOUC (Flash of Unstyled Content)
-   Garante que o site só apareça após o processamento do Tailwind
+   Só esconde o conteúdo enquanto o JavaScript aplica a classe de loading
    --------------------------------------------------------- */
-body {
+html.js-loading body {
   opacity: 0;
-}
-
-.ready body {
-  opacity: 1;
-  transition: opacity 0s ease-in;
 }
 
 @media (prefers-reduced-motion: reduce) {

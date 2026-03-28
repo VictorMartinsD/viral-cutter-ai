@@ -1378,7 +1378,7 @@ gsap.fromTo(
     duration: 0.9,
     stagger: 0.08,
     ease: "power4.out",
-    delay: 0.12,
+    delay: 0,
   },
 );
 
@@ -1390,7 +1390,7 @@ gsap.utils.toArray(".reveal").forEach((item, index) => {
       y: 0,
       autoAlpha: 1,
       duration: 0.72,
-      delay: index * 0.04,
+      delay: 0,
       ease: "power2.out",
       scrollTrigger: {
         trigger: item,
