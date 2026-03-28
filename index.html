@@ -200,13 +200,23 @@
             >Chave da API Gemini</label
           >
 
-          <input
-            id="apiKey"
-            type="text"
-            autocomplete="off"
-            spellcheck="false"
-            placeholder="Digite sua chave da API"
-            class="mt-3 w-full rounded-2xl border border-zinc-300 bg-zinc-50 px-4 py-4 text-sm text-slate-950 shadow-sm outline-none transition-all duration-300 placeholder:text-slate-500 focus:border-zinc-600 focus:ring-4 focus:ring-zinc-500/20 dark:border-zinc-800 dark:bg-zinc-950/70 dark:text-slate-50 dark:placeholder:text-slate-500" />
+          <div class="relative mt-3">
+            <input
+              id="apiKey"
+              type="password"
+              autocomplete="off"
+              spellcheck="false"
+              placeholder="Digite sua chave da API"
+              class="w-full rounded-2xl border border-zinc-300 bg-zinc-50 px-4 py-4 pr-12 text-sm text-slate-950 shadow-sm outline-none transition-all duration-300 placeholder:text-slate-500 focus:border-zinc-600 focus:ring-4 focus:ring-zinc-500/20 dark:border-zinc-800 dark:bg-zinc-950/70 dark:text-slate-50 dark:placeholder:text-slate-500" />
+
+            <button
+              id="apiKeyVisibilityToggle"
+              type="button"
+              aria-label="Mostrar chave da API"
+              class="absolute inset-y-0 right-3 inline-flex items-center justify-center rounded-xl p-2 text-slate-600 transition-colors duration-300 hover:bg-zinc-200/70 hover:text-slate-800 dark:text-zinc-300 dark:hover:bg-zinc-800 dark:hover:text-zinc-100">
+              <i id="apiKeyVisibilityIcon" data-lucide="eye" class="h-4 w-4"></i>
+            </button>
+          </div>
 
           <div class="mt-4 flex flex-wrap items-center gap-3 sm:justify-between">
             <button

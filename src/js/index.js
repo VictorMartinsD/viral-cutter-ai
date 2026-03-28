@@ -3,6 +3,12 @@ import { initTheme } from "./theme.js";
 import { waitForTranscription, getTranscription, getViralMoment, processWidgetResult } from "./api.js";
 import { storageKeys, savePromptState, loadPromptState, loadSavedVideos, saveSavedVideos } from "./storage.js";
 
+const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+if (prefersReducedMotion) {
+  gsap.globalTimeline.timeScale(100);
+  gsap.defaults({ duration: 0 });
+}
+
 const el = {
   root: document.documentElement,
   body: document.body,
@@ -11,6 +17,8 @@ const el = {
   video: document.getElementById("video"),
   videoFrame: document.getElementById("videoFrame"),
   apiKey: document.getElementById("apiKey"),
+  apiKeyVisibilityToggle: document.getElementById("apiKeyVisibilityToggle"),
+  apiKeyVisibilityIcon: document.getElementById("apiKeyVisibilityIcon"),
   button: document.getElementById("uploadWidget"),
   apiHelpButton: document.getElementById("apiHelpButton"),
   apiModal: document.getElementById("apiModal"),
@@ -54,6 +62,7 @@ const app = {
   public_id: "",
   widget: null,
   apiKeyRawValue: "",
+  isApiKeyVisible: false,
   prompts: [],
   promptConfigs: [],
   editingPromptId: null,
@@ -1288,7 +1297,30 @@ const openApiModal = openApiModalFunc;
 const closeApiModal = closeApiModalFunc;
 
 const renderApiMask = () => {
-  el.apiKey.value = "*".repeat(app.apiKeyRawValue.length);
+  el.apiKey.value = app.apiKeyRawValue;
+};
+
+const renderApiKeyVisibilityState = () => {
+  const iconName = app.isApiKeyVisible ? "eye-off" : "eye";
+
+  el.apiKey.type = app.isApiKeyVisible ? "text" : "password";
+  el.apiKeyVisibilityToggle.setAttribute(
+    "aria-label",
+    app.isApiKeyVisible ? "Ocultar chave da API" : "Mostrar chave da API",
+  );
+  el.apiKeyVisibilityToggle.innerHTML = `<i data-lucide="${iconName}" class="h-4 w-4"></i>`;
+  lucide.createIcons();
+};
+
+const toggleApiKeyVisibility = () => {
+  app.isApiKeyVisible = !app.isApiKeyVisible;
+  renderApiKeyVisibilityState();
+  el.apiKey.focus();
+
+  requestAnimationFrame(() => {
+    const length = el.apiKey.value.length;
+    el.apiKey.setSelectionRange(length, length);
+  });
 };
 
 const openWidget = () => {
@@ -1318,6 +1350,7 @@ const openWidget = () => {
 };
 
 lucide.createIcons();
+renderApiKeyVisibilityState();
 initTheme({
   onToggle: () => {
     if (app.widget) {
@@ -1784,7 +1817,18 @@ el.securityToggle.addEventListener("click", () => {
   }
 });
 
+el.apiKeyVisibilityToggle.addEventListener("click", () => {
+  toggleApiKeyVisibility();
+});
+
 el.apiKey.addEventListener("keydown", (event) => {
+  const isToggleShortcut = event.ctrlKey && event.shiftKey && event.key.toLowerCase() === "h";
+  if (isToggleShortcut) {
+    event.preventDefault();
+    toggleApiKeyVisibility();
+    return;
+  }
+
   const isModifier = event.ctrlKey || event.metaKey || event.altKey;
   if (isModifier && ["a", "c", "x", "v"].includes(event.key.toLowerCase())) {
     return;
