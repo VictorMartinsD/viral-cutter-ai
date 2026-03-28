@@ -1,6 +1,14 @@
 <!doctype html>
 <html lang="pt-BR" class="dark">
   <head>
+    <script>
+      document.documentElement.classList.add("js-loading");
+
+      const removeLoading = () => document.documentElement.classList.remove("js-loading");
+      window.addEventListener("DOMContentLoaded", removeLoading);
+      setTimeout(removeLoading, 3000);
+    </script>
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cutter.ai | Cortes Virais com IA</title>
@@ -56,6 +64,12 @@
 
   <body
     class="min-h-screen bg-slate-100 text-slate-600 antialiased selection:bg-slate-200 selection:text-slate-950 dark:bg-[#000000] dark:text-slate-400">
+    <noscript>
+      <div style="background: #e11d48; color: white; text-align: center; padding: 0.5rem; font-size: 0.875rem">
+        Para uma experiência completa com animações e funcionalidades, por favor habilite o JavaScript.
+      </div>
+    </noscript>
+
     <div aria-hidden="true" class="atmospheric-background pointer-events-none fixed inset-0 overflow-hidden">
       <div class="aura-layer aura-layer-1"></div>
       <div class="aura-layer aura-layer-2"></div>
