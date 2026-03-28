@@ -1324,7 +1324,7 @@ const toggleApiKeyVisibility = () => {
 };
 
 const openWidget = () => {
-  app.widget = cloudinary.createUploadWidget(
+  app.widget = window.cloudinary.createUploadWidget(
     {
       ...config,
       styles: getWidgetStyles(),
@@ -1889,7 +1889,9 @@ el.apiKey.addEventListener("focus", () => {
   });
 });
 
-el.button.addEventListener("click", async () => {
+el.button.addEventListener("click", async (e) => {
+  e.preventDefault();
+
   if (!app.apiKeyRawValue) {
     await showAlertDialog("Insira sua chave da API do Gemini para continuar.", {
       title: "Configuração necessária",
