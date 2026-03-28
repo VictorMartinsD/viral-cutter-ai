@@ -1368,6 +1368,8 @@ clearPromptEditor();
 updatePromptInputLimits();
 updatePromptTitlePlaceholder();
 gsap.registerPlugin(ScrollTrigger);
+gsap.config({ trial: true });
+ScrollTrigger.config({ limitCallbacks: true });
 
 gsap.from(".hero-word", {
   y: 40,
@@ -1383,12 +1385,15 @@ gsap.utils.toArray(".reveal").forEach((item) => {
   gsap.from(item, {
     y: 24,
     autoAlpha: 0,
+    force3D: true,
     duration: 0.72,
     ease: "power2.out",
     immediateRender: false,
     scrollTrigger: {
       trigger: item,
-      start: "top 86%",
+      start: "top 92%",
+      fastScrollEnd: true,
+      toggleActions: "play none none none",
       once: true,
     },
   });
@@ -1399,6 +1404,7 @@ let hasBenefitsHighlightPlayed = false;
 ScrollTrigger.create({
   trigger: "#beneficios",
   start: "top 70%",
+  fastScrollEnd: true,
   once: true,
   onEnter: () => {
     if (hasBenefitsHighlightPlayed) {
