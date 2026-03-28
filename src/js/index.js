@@ -1,4 +1,4 @@
-import { clamp, generateId, escapeHTML, truncateText, truncatePlayerVideoTitle } from "./utils.js";
+import { generateId, escapeHTML, truncateText, truncatePlayerVideoTitle } from "./utils.js";
 import { initTheme } from "./theme.js";
 import { waitForTranscription, getTranscription, getViralMoment, processWidgetResult } from "./api.js";
 import { storageKeys, savePromptState, loadPromptState, loadSavedVideos, saveSavedVideos } from "./storage.js";
@@ -81,6 +81,13 @@ const app = {
 const config = {
   cloudName: "df0kqv5py",
   uploadPreset: "upload_nlw",
+};
+
+const INPUT_LIMITS = {
+  promptTitle: 60,
+  promptText: 2000,
+  videoTitle: 120,
+  apiKey: 150,
 };
 
 const debounce = (callback, wait = 120) => {
@@ -300,7 +307,7 @@ const startCurrentVideoTitleEdit = () => {
   input.id = "videoNowTitle";
   input.className = "saved-video-title-input player-video-title-input";
   input.value = originalTitle;
-  input.maxLength = 100;
+  input.maxLength = INPUT_LIMITS.videoTitle;
   input.setAttribute("aria-label", "Editar título do vídeo atual");
   input.style.marginTop = originalMarginTop;
 
@@ -310,7 +317,7 @@ const startCurrentVideoTitleEdit = () => {
   input.select();
 
   const finishEdit = (shouldCommit) => {
-    const nextTitle = input.value.trim();
+    const nextTitle = input.value.trim().slice(0, INPUT_LIMITS.videoTitle);
     const finalTitle = shouldCommit && nextTitle ? nextTitle : originalTitle;
 
     if (shouldCommit && nextTitle && nextTitle !== originalTitle) {
@@ -411,6 +418,29 @@ const joinWithCommasAndConjunction = (items = []) => {
   }
 
   return `${items.slice(0, -1).join(", ")} e ${items[items.length - 1]}`;
+};
+
+const sanitizeConfigTitle = (value = "") =>
+  String(value || "")
+    .trim()
+    .substring(0, 60);
+
+const normalizePromptConfigTitles = () => {
+  let hasChanges = false;
+
+  app.promptConfigs = app.promptConfigs.map((cfg) => {
+    const safeName = sanitizeConfigTitle(cfg.name) || "Sem nome";
+    if (safeName !== cfg.name) {
+      hasChanges = true;
+      return { ...cfg, name: safeName };
+    }
+
+    return cfg;
+  });
+
+  if (hasChanges) {
+    savePromptState(app);
+  }
 };
 
 const formatOrphanConfigsWarning = (orphanConfigs = []) => {
@@ -561,12 +591,8 @@ const clearPromptEditor = () => {
 };
 
 const updatePromptInputLimits = () => {
-  const titleWidth = el.promptTitleInput.clientWidth || 280;
-  const textWidth = el.promptTextInput.clientWidth || 280;
-  const textHeight = el.promptTextInput.clientHeight || 96;
-
-  const titleMaxLength = clamp(Math.round(titleWidth / 6.5), 28, 96);
-  const textMaxLength = clamp(Math.round((textWidth * textHeight) / 16), 120, 900);
+  const titleMaxLength = INPUT_LIMITS.promptTitle;
+  const textMaxLength = INPUT_LIMITS.promptText;
 
   el.promptTitleInput.maxLength = titleMaxLength;
   el.promptTextInput.maxLength = textMaxLength;
@@ -1043,8 +1069,8 @@ const deleteSelectedVideos = async () => {
 };
 
 const createPrompt = async () => {
-  const titleRaw = el.promptTitleInput.value.trim();
-  const text = el.promptTextInput.value.trim();
+  const titleRaw = el.promptTitleInput.value.trim().slice(0, INPUT_LIMITS.promptTitle);
+  const text = el.promptTextInput.value.trim().slice(0, INPUT_LIMITS.promptText);
 
   if (!text) {
     await showAlertDialog("Escreva uma instrução antes de salvar.", {
@@ -1076,8 +1102,8 @@ const updatePrompt = async () => {
     return;
   }
 
-  const titleRaw = el.promptTitleInput.value.trim();
-  const text = el.promptTextInput.value.trim();
+  const titleRaw = el.promptTitleInput.value.trim().slice(0, INPUT_LIMITS.promptTitle);
+  const text = el.promptTextInput.value.trim().slice(0, INPUT_LIMITS.promptText);
 
   if (!text) {
     await showAlertDialog("Escreva uma instrução antes de salvar.", {
@@ -1141,7 +1167,7 @@ const createConfig = async () => {
 
   app.promptConfigs.unshift({
     id: configId,
-    name: defaultName,
+    name: sanitizeConfigTitle(defaultName),
     promptIds: [...activePromptIds],
   });
 
@@ -1361,6 +1387,7 @@ initTheme({
 });
 renderApiMask();
 loadPromptState(app);
+normalizePromptConfigTitles();
 loadSavedVideos(app);
 renderPromptUI();
 renderSavedVideos();
@@ -1559,14 +1586,14 @@ el.promptList.addEventListener("click", async (event) => {
     input.type = "text";
     input.value = originalName;
     input.className = "prompt-title-input";
-    input.maxLength = 100;
+    input.maxLength = INPUT_LIMITS.promptTitle;
 
     titleElement.replaceWith(input);
     input.focus();
     input.select();
 
     const saveEdit = () => {
-      const newName = input.value.trim();
+      const newName = input.value.trim().slice(0, INPUT_LIMITS.promptTitle);
       if (newName && newName !== originalName) {
         targetPrompt.title = newName;
         savePromptState(app);
@@ -1712,15 +1739,36 @@ el.promptConfigList.addEventListener("click", async (event) => {
 
     const input = document.createElement("input");
     input.type = "text";
-    input.value = originalName;
+    input.value = sanitizeConfigTitle(originalName);
     input.className = "config-title-input";
+    input.maxLength = 60;
 
     titleElement.replaceWith(input);
     input.focus();
     input.select();
 
+    input.addEventListener("input", () => {
+      if (input.value.length > 60) {
+        input.value = input.value.substring(0, 60);
+      }
+    });
+
+    input.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const pastedText = (e.clipboardData || window.clipboardData).getData("text");
+      input.value = `${input.value}${pastedText}`.substring(0, 60);
+    });
+
+    input.addEventListener("keydown", (e) => {
+      const atLimit = input.value.length >= 60;
+      const isPrintable = e.key.length === 1 && !e.ctrlKey && !e.metaKey && !e.altKey;
+      if (atLimit && isPrintable) {
+        e.preventDefault();
+      }
+    });
+
     const saveEdit = () => {
-      const newName = input.value.trim();
+      const newName = input.value.trim().substring(0, 60);
       if (newName && newName !== originalName) {
         targetConfig.name = newName;
         savePromptState(app);
@@ -1866,6 +1914,11 @@ el.apiKey.addEventListener("keydown", (event) => {
   }
 
   if (event.key.length === 1) {
+    if (app.apiKeyRawValue.length >= INPUT_LIMITS.apiKey) {
+      event.preventDefault();
+      return;
+    }
+
     app.apiKeyRawValue += event.key;
     renderApiMask();
     event.preventDefault();
@@ -1874,10 +1927,10 @@ el.apiKey.addEventListener("keydown", (event) => {
 
 el.apiKey.addEventListener("paste", (event) => {
   event.preventDefault();
-  const pastedText = (event.clipboardData || window.clipboardData).getData("text").trim();
+  const pastedText = (event.clipboardData || window.clipboardData).getData("text").trim().slice(0, INPUT_LIMITS.apiKey);
 
   if (pastedText) {
-    app.apiKeyRawValue += pastedText;
+    app.apiKeyRawValue = `${app.apiKeyRawValue}${pastedText}`.slice(0, INPUT_LIMITS.apiKey);
     renderApiMask();
   }
 });
@@ -1891,6 +1944,9 @@ el.apiKey.addEventListener("focus", () => {
 
 el.button.addEventListener("click", async (e) => {
   e.preventDefault();
+
+  app.apiKeyRawValue = app.apiKeyRawValue.trim().slice(0, INPUT_LIMITS.apiKey);
+  renderApiMask();
 
   if (!app.apiKeyRawValue) {
     await showAlertDialog("Insira sua chave da API do Gemini para continuar.", {
@@ -2047,14 +2103,14 @@ el.savedVideosList.addEventListener("click", async (event) => {
     input.type = "text";
     input.value = originalName;
     input.className = "saved-video-title-input";
-    input.maxLength = 100;
+    input.maxLength = INPUT_LIMITS.videoTitle;
 
     titleElement.replaceWith(input);
     input.focus();
     input.select();
 
     const saveEdit = () => {
-      const newName = input.value.trim();
+      const newName = input.value.trim().slice(0, INPUT_LIMITS.videoTitle);
       if (newName && newName !== originalName) {
         video.name = newName;
         saveSavedVideos(app);
