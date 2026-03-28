@@ -3,9 +3,15 @@
   <head>
     <script>
       document.documentElement.classList.add("js-loading");
+      let hasRevealed = false;
+      const removeLoading = () => {
+        if (hasRevealed) return;
+        hasRevealed = true;
+        document.documentElement.classList.remove("js-loading");
+      };
 
-      const removeLoading = () => document.documentElement.classList.remove("js-loading");
-      window.addEventListener("DOMContentLoaded", removeLoading);
+      requestAnimationFrame(removeLoading);
+      window.addEventListener("DOMContentLoaded", removeLoading, { once: true });
       setTimeout(removeLoading, 3000);
     </script>
 

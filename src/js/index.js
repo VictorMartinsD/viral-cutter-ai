@@ -1369,36 +1369,29 @@ updatePromptInputLimits();
 updatePromptTitlePlaceholder();
 gsap.registerPlugin(ScrollTrigger);
 
-gsap.fromTo(
-  ".hero-word",
-  { y: 40, autoAlpha: 0 },
-  {
-    y: 0,
-    autoAlpha: 1,
-    duration: 0.9,
-    stagger: 0.08,
-    ease: "power4.out",
-    delay: 0,
-  },
-);
+gsap.from(".hero-word", {
+  y: 40,
+  autoAlpha: 0,
+  duration: 0.9,
+  stagger: 0.08,
+  ease: "power4.out",
+  delay: 0,
+  immediateRender: false,
+});
 
-gsap.utils.toArray(".reveal").forEach((item, index) => {
-  gsap.fromTo(
-    item,
-    { y: 24, autoAlpha: 0 },
-    {
-      y: 0,
-      autoAlpha: 1,
-      duration: 0.72,
-      delay: 0,
-      ease: "power2.out",
-      scrollTrigger: {
-        trigger: item,
-        start: "top 86%",
-        once: true,
-      },
+gsap.utils.toArray(".reveal").forEach((item) => {
+  gsap.from(item, {
+    y: 24,
+    autoAlpha: 0,
+    duration: 0.72,
+    ease: "power2.out",
+    immediateRender: false,
+    scrollTrigger: {
+      trigger: item,
+      start: "top 86%",
+      once: true,
     },
-  );
+  });
 });
 
 let hasBenefitsHighlightPlayed = false;
@@ -1413,17 +1406,14 @@ ScrollTrigger.create({
     }
 
     hasBenefitsHighlightPlayed = true;
-    gsap.fromTo(
-      ".benefit-word",
-      { y: 40, autoAlpha: 0 },
-      {
-        y: 0,
-        autoAlpha: 1,
-        duration: 0.75,
-        stagger: 0.07,
-        ease: "power3.out",
-      },
-    );
+    gsap.from(".benefit-word", {
+      y: 40,
+      autoAlpha: 0,
+      duration: 0.75,
+      stagger: 0.07,
+      ease: "power3.out",
+      immediateRender: false,
+    });
   },
 });
 

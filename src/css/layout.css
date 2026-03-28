@@ -120,8 +120,6 @@ html.dark .aura-layer-3 {
 .hero-word,
 .benefit-word {
   display: inline-block;
-  opacity: 0;
-  transform: translateY(40px);
   will-change: transform, opacity;
 }
 
@@ -149,8 +147,6 @@ html.dark .highlight-text {
 }
 
 .reveal {
-  opacity: 0;
-  transform: translateY(24px);
   will-change: transform, opacity;
 }
 
