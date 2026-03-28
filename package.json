@@ -6,6 +6,10 @@
   "description": "Automação inteligente para criação de cortes virais a partir de vídeos longos, integrando Google Gemini e Cloudinary.",
   "main": "index.html",
   "scripts": {
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "check": "npm run lint && npm run format",
     "format": "prettier --write .",
     "prepare": "husky"
   },
