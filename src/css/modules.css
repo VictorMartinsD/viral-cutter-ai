@@ -6,8 +6,6 @@ html.dark #beneficios article p {
   color: #cbd5e1;
 }
 
-/* Player */
-
 #videoFrame.video-frame {
   position: relative;
   overflow: hidden;
@@ -84,8 +82,6 @@ html.dark .video-loading::before {
     text-align: center;
   }
 }
-
-/* Prompts */
 
 .prompt-item {
   border: 1px solid rgba(161, 161, 170, 0.45);
@@ -269,7 +265,6 @@ html.dark #promptEditorContainer {
   }
 }
 
-/* Dark mode versions */
 @keyframes highlight-appear-dark {
   0% {
     border-color: rgba(74, 222, 128, 0);
@@ -935,7 +930,6 @@ html.dark .saved-video-title-input {
   scroll-behavior: smooth;
 }
 
-/* Scrollbar styling for saved videos grid */
 .saved-videos-grid::-webkit-scrollbar {
   width: 6px;
 }

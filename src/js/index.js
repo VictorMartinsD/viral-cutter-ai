@@ -1697,7 +1697,6 @@ el.promptList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Alterna o estado pelo card inteiro, preservando cliques em botoes.
   const articleElement = event.target.closest("article[data-prompt-id]");
   if (articleElement && !event.target.closest("button")) {
     const promptId = articleElement.getAttribute("data-prompt-id");
@@ -1812,7 +1811,6 @@ el.promptConfigList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Alterna o estado pelo card inteiro, preservando cliques em controles.
   const articleElement = event.target.closest("article[class*='config-card']");
   if (articleElement && !event.target.closest("button") && !event.target.closest("input")) {
     const configId = articleElement.getAttribute("data-config-id");
@@ -2091,7 +2089,6 @@ el.savedVideosList.addEventListener("mouseout", (event) => {
 });
 
 el.savedVideosList.addEventListener("click", async (event) => {
-  // Fluxo de edicao inline do titulo.
   const titleElement = event.target.closest(".saved-video-title");
   if (titleElement && !app.isVideoSelectionMode) {
     const videoId = titleElement.getAttribute("data-video-title-id");
@@ -2129,7 +2126,6 @@ el.savedVideosList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Exclusao individual com confirmacao.
   const deleteButton = event.target.closest("[data-video-delete-id]");
   if (deleteButton) {
     const videoId = deleteButton.getAttribute("data-video-delete-id");
@@ -2152,7 +2148,6 @@ el.savedVideosList.addEventListener("click", async (event) => {
     return;
   }
 
-  // Selecao em lote quando modo de selecao estiver ativo.
   const videoItem = event.target.closest(".saved-video-item");
   if (!videoItem) return;
 
