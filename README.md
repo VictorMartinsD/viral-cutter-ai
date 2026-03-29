@@ -5,7 +5,7 @@
 <div align="center">
 
 [![Acessar Deploy](https://img.shields.io/badge/Acessar%20Deploy-Github%20Pages-blue?style=for-the-badge)](https://victormartinsd.github.io/viral-cutter-ai/)
-[![GitHub](https://img.shields.io/badge/Repositório%20GitHub-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/VictorMartinsD/viral-cutter-ai)
+[![📘 Notas de Estudo](https://img.shields.io/badge/%F0%9F%93%98%20Notas%20de%20Estudo-Documenta%C3%A7%C3%A3o-0ea5e9?style=for-the-badge)](./notas-de-estudo.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://github.com/VictorMartinsD/viral-cutter-ai/blob/main/LICENSE)
 
 Automação inteligente para criação de cortes virais a partir de vídeos longos, integrando Google Gemini e Cloudinary.
@@ -16,17 +16,15 @@ Automação inteligente para criação de cortes virais a partir de vídeos long
 
 > Idioma desta seção: **Português (pt-BR)**.
 
-## Sumário
+<div align="center">
 
-- [Sobre o Projeto](#sobre-o-projeto)
-- [Funcionalidades](#funcionalidades)
-- [🖼️ Preview](#preview-pt)
-- [Arquitetura e Decisões Técnicas](#arquitetura-e-decisões-técnicas)
-- [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)
-- [Como Rodar Localmente](#como-rodar-localmente)
-- [Estrutura do Projeto](#estrutura-do-projeto)
-- [Aprendizados e Crescimento](#aprendizados-e-crescimento)
-- [README in English](#readme-en)
+## Sumário | Summary
+
+| Português                                                                                                                                                                                                                                                                                                                                                                                                                                                       | English                                                                                                                                                                                                                                                                                                                                                                                                      |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| - [Sobre o Projeto](#sobre-o-projeto)<br>- [Funcionalidades](#funcionalidades)<br>- [🖼️ Preview](#preview-pt)<br>- [Arquitetura e Decisões Técnicas](#arquitetura-e-decisões-técnicas)<br>- [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)<br>- [Como Rodar Localmente](#como-rodar-localmente)<br>- [Estrutura do Projeto](#estrutura-do-projeto)<br>- [Aprendizados e Crescimento](#aprendizados-e-crescimento)<br>- [README in English](#readme-en) | - [About the Project](#about-the-project)<br>- [Features](#features)<br>- [🖼️ Preview](#preview-en)<br>- [Architecture & Technical Decisions](#architecture--technical-decisions)<br>- [Technologies & Tools](#technologies--tools)<br>- [Getting Started](#getting-started)<br>- [Project Structure](#project-structure)<br>- [Learning & Growth](#learning--growth)<br>- [README em Português](#readme-pt) |
+
+</div>
 
 ---
 
@@ -403,7 +401,7 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 <div align="center">
 
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Github%20Pages-blue?style=for-the-badge)](https://victormartinsd.github.io/viral-cutter-ai/)
-[![GitHub Repository](https://img.shields.io/badge/GitHub%20Repository-black?style=for-the-badge&logo=github&logoColor=white)](https://github.com/VictorMartinsD/viral-cutter-ai)
+[![📘 Study Notes](https://img.shields.io/badge/%F0%9F%93%98%20Study%20Notes-Documentation-0ea5e9?style=for-the-badge)](./notas-de-estudo.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://github.com/VictorMartinsD/viral-cutter-ai/blob/main/LICENSE)
 
 Intelligent automation for creating viral video clips from long-form content, integrating Google Gemini and Cloudinary.
@@ -413,18 +411,6 @@ Intelligent automation for creating viral video clips from long-form content, in
 ---
 
 > Language of this section: **English (en-US)**.
-
-## Table of Contents
-
-- [About the Project](#about-the-project)
-- [Features](#features)
-- [🖼️ Preview](#preview-en)
-- [Architecture & Technical Decisions](#architecture--technical-decisions)
-- [Technologies & Tools](#technologies--tools)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Learning & Growth](#learning--growth)
-- [README em Português](#readme-pt)
 
 ---
 
