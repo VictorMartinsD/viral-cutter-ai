@@ -1,3 +1,5 @@
+<a id="readme-pt"></a>
+
 # Cutter.ai
 
 <div align="center">
@@ -24,7 +26,7 @@ Automação inteligente para criação de cortes virais a partir de vídeos long
 - [Como Rodar Localmente](#como-rodar-localmente)
 - [Estrutura do Projeto](#estrutura-do-projeto)
 - [Aprendizados e Crescimento](#aprendizados-e-crescimento)
-- [README in English (GitHub)](https://github.com/VictorMartinsD/viral-cutter-ai/blob/main/README.md)
+- [README in English](#readme-en)
 
 ---
 
@@ -394,6 +396,8 @@ Este projeto está licenciado sob a [MIT License](LICENSE).
 
 ---
 
+<a id="readme-en"></a>
+
 # Cutter.ai
 
 <div align="center">
@@ -420,7 +424,7 @@ Intelligent automation for creating viral video clips from long-form content, in
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [Learning & Growth](#learning--growth)
-- [README em Português (GitHub)](https://github.com/VictorMartinsD/viral-cutter-ai/blob/main/README_PT.md)
+- [README em Português](#readme-pt)
 
 ---
 
