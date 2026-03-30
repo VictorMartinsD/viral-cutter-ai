@@ -14,6 +14,7 @@ const el = {
   body: document.body,
   status: document.getElementById("status"),
   videoNowTitle: document.getElementById("videoNowTitle"),
+  videoDownloadBtn: document.getElementById("videoDownloadBtn"),
   video: document.getElementById("video"),
   videoFrame: document.getElementById("videoFrame"),
   apiKey: document.getElementById("apiKey"),
@@ -143,6 +144,86 @@ const updateStatus = (message, loading = false) => {
 
 const setVideoFrameLoading = (isLoading) => {
   el.videoFrame.classList.toggle("video-loading", isLoading);
+};
+
+const toDownloadFileName = (name = "video-cortado") =>
+  String(name)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]+/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .toLowerCase()
+    .slice(0, 80) || "video-cortado";
+
+const getCurrentVideoDownloadPayload = () => {
+  const currentSavedVideo = app.currentVideoId
+    ? app.savedVideos.find((video) => video.id === app.currentVideoId)
+    : null;
+
+  const source = currentSavedVideo?.clipUrl || el.video.currentSrc || el.video.getAttribute("src") || "";
+  if (!source) {
+    return null;
+  }
+
+  const title = currentSavedVideo?.name || el.videoNowTitle?.getAttribute("title") || "video-cortado";
+  return {
+    url: source,
+    fileName: `${toDownloadFileName(title)}.mp4`,
+  };
+};
+
+const updateVideoDownloadButtonState = () => {
+  if (!el.videoDownloadBtn) {
+    return;
+  }
+
+  const payload = getCurrentVideoDownloadPayload();
+  const isEnabled = Boolean(payload?.url);
+
+  el.videoDownloadBtn.disabled = !isEnabled;
+  el.videoDownloadBtn.setAttribute("aria-disabled", String(!isEnabled));
+  el.videoDownloadBtn.title = isEnabled ? "Baixar vídeo atual" : "Carregue um vídeo para habilitar o download";
+
+  if (!isEnabled) {
+    delete el.videoDownloadBtn.dataset.downloadUrl;
+    delete el.videoDownloadBtn.dataset.downloadName;
+    return;
+  }
+
+  el.videoDownloadBtn.dataset.downloadUrl = payload.url;
+  el.videoDownloadBtn.dataset.downloadName = payload.fileName;
+};
+
+const triggerFileDownload = (url, fileName) => {
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = fileName;
+  document.body.append(anchor);
+  anchor.click();
+  anchor.remove();
+};
+
+const downloadCurrentVideo = async () => {
+  const payload = getCurrentVideoDownloadPayload();
+  if (!payload) {
+    return;
+  }
+
+  try {
+    const response = await fetch(payload.url);
+    if (!response.ok) {
+      throw new Error("Falha ao baixar o video");
+    }
+
+    const videoBlob = await response.blob();
+    const blobUrl = URL.createObjectURL(videoBlob);
+
+    triggerFileDownload(blobUrl, payload.fileName);
+    setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
+  } catch {
+    triggerFileDownload(payload.url, payload.fileName);
+  }
 };
 
 const isWideViewportForSuccessBar = () => window.innerWidth > 789;
@@ -1015,12 +1096,14 @@ const playSavedVideo = (videoId) => {
       }
       const label = targetVideo.name;
       setCurrentVideoTitle(label);
+      updateVideoDownloadButtonState();
       const highlightCurrentVideoIds = previousCurrentVideoId !== targetVideo.id ? [targetVideo.id] : [];
       renderSavedVideos({ highlightCurrentVideoIds });
     },
     { once: true },
   );
   el.video.setAttribute("src", source);
+  updateVideoDownloadButtonState();
 };
 
 const updateVideoToolbarState = () => {
@@ -1366,6 +1449,7 @@ const openWidget = () => {
         saveSavedVideos,
         renderSavedVideos,
         handleUploadSuccessFeedback,
+        updateVideoDownloadButtonState,
         getPriorityPromptBlock,
         waitForTranscriptionFn: waitForTranscription,
         getTranscriptionFn: getTranscription,
@@ -1391,6 +1475,7 @@ normalizePromptConfigTitles();
 loadSavedVideos(app);
 renderPromptUI();
 renderSavedVideos();
+updateVideoDownloadButtonState();
 clearPromptEditor();
 updatePromptInputLimits();
 updatePromptTitlePlaceholder();
@@ -1967,11 +2052,24 @@ el.apiHelpButton.addEventListener("click", () => {
   animateButtonPress(el.apiHelpButton);
 });
 
+el.videoDownloadBtn?.addEventListener("click", () => {
+  if (el.videoDownloadBtn.disabled) {
+    return;
+  }
+
+  animateButtonPress(el.videoDownloadBtn);
+  downloadCurrentVideo();
+});
+
 el.video.addEventListener("play", () => {
   if (app.latestUploadedVideoId && app.currentVideoId === app.latestUploadedVideoId) {
     hideSuccessJumpBar();
   }
 });
+
+el.video.addEventListener("loadeddata", updateVideoDownloadButtonState);
+el.video.addEventListener("emptied", updateVideoDownloadButtonState);
+el.video.addEventListener("error", updateVideoDownloadButtonState);
 
 document.addEventListener("click", (event) => {
   const titleElement = event.target.closest("#videoNowTitle");

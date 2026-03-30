@@ -1,16 +1,16 @@
 .video-support-notice {
   margin: 0.5rem auto;
-  width: min(95%, 31rem);
+  width: auto;
   max-width: 100%;
-  min-height: 2.2rem;
+  min-height: 1.4rem;
   height: auto;
   max-height: none;
-  padding: 0.3rem 0.65rem;
-  border: 1px solid rgba(228, 228, 231, 0.85);
-  border-radius: 0.6rem;
-  background: rgba(255, 255, 255, 0.6);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
   color: #334155;
   display: flex;
   align-items: center;
@@ -49,8 +49,6 @@
 }
 
 html.dark .video-support-notice {
-  border-color: rgba(82, 82, 91, 0.45);
-  background: rgba(0, 0, 0, 0.2);
   color: #d4d4d8;
 }
 

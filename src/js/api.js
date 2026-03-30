@@ -96,6 +96,7 @@ export const processWidgetResult = async (error, result, context) => {
     saveSavedVideos,
     renderSavedVideos,
     handleUploadSuccessFeedback,
+    updateVideoDownloadButtonState,
     getPriorityPromptBlock,
     waitForTranscriptionFn = waitForTranscription,
     getTranscriptionFn = getTranscription,
@@ -157,6 +158,7 @@ export const processWidgetResult = async (error, result, context) => {
     );
 
     el.video.setAttribute("src", viralMomentURL);
+    updateVideoDownloadButtonState();
   } catch (fetchError) {
     setVideoFrameLoading(false);
     updateStatus("Não foi possível gerar o corte agora. Tente novamente.", false);
