@@ -1520,73 +1520,109 @@ gsap.registerPlugin(ScrollTrigger);
 gsap.config({ trial: true });
 ScrollTrigger.config({ limitCallbacks: true });
 
-gsap.from(".hero-word", {
-  y: 40,
-  autoAlpha: 0,
-  duration: 0.9,
-  stagger: 0.08,
-  ease: "power4.out",
-  delay: 0,
-  immediateRender: false,
-});
+const uniqueElements = (elements) => Array.from(new Set(elements.filter(Boolean)));
 
-gsap.utils.toArray(".reveal").forEach((item) => {
-  gsap.from(item, {
-    y: 24,
-    autoAlpha: 0,
-    force3D: true,
-    duration: 0.72,
-    ease: "power2.out",
-    immediateRender: false,
-    scrollTrigger: {
-      trigger: item,
-      start: "top 92%",
-      fastScrollEnd: true,
-      toggleActions: "play none none none",
-      once: true,
-    },
-  });
-});
+const registerScrollReveal = ({ elements, startState, duration = 0.65, ease = "power2.out" }) => {
+  elements.forEach((element) => {
+    const isLateTarget = element.classList.contains("reveal-late");
+    const isReverseTarget = element.classList.contains("reveal-reverse");
+    const isDelayedTarget = element.classList.contains("reveal-delay-last");
+    const enterStart = isDelayedTarget ? "top 90%" : isReverseTarget ? "top 85%" : isLateTarget ? "top 92%" : "top 80%";
 
-gsap.from(".powered-by-pill", {
-  y: 12,
-  scale: 0.985,
-  autoAlpha: 0,
-  duration: 0.56,
-  ease: "power2.out",
-  immediateRender: false,
-  scrollTrigger: {
-    trigger: ".powered-by-pill",
-    start: "top 94%",
-    fastScrollEnd: true,
-    toggleActions: "play none none none",
-    once: true,
-  },
-});
+    gsap.fromTo(
+      element,
+      {
+        autoAlpha: 0,
+        x: startState.x || 0,
+        y: startState.y || 0,
+      },
+      {
+        autoAlpha: 1,
+        x: 0,
+        y: 0,
+        duration,
+        ease,
+        overwrite: "auto",
+        scrollTrigger: {
+          trigger: element,
+          start: enterStart,
+          end: isReverseTarget ? "bottom 70%" : undefined,
+          fastScrollEnd: true,
+          toggleActions: isReverseTarget ? "play none none reverse" : "play none none none",
+        },
+      },
+    );
 
-let hasBenefitsHighlightPlayed = false;
-
-ScrollTrigger.create({
-  trigger: "#beneficios",
-  start: "top 70%",
-  fastScrollEnd: true,
-  once: true,
-  onEnter: () => {
-    if (hasBenefitsHighlightPlayed) {
+    if (isReverseTarget) {
       return;
     }
 
-    hasBenefitsHighlightPlayed = true;
-    gsap.from(".benefit-word", {
-      y: 40,
-      autoAlpha: 0,
-      duration: 0.75,
-      stagger: 0.07,
-      ease: "power3.out",
-      immediateRender: false,
+    ScrollTrigger.create({
+      trigger: element,
+      start: "top bottom",
+      end: "bottom bottom",
+      fastScrollEnd: true,
+      onLeaveBack: () => {
+        gsap.set(element, {
+          autoAlpha: 0,
+          x: startState.x || 0,
+          y: startState.y || 0,
+        });
+      },
     });
-  },
-});
+  });
+};
+
+const titleRevealTargets = uniqueElements([
+  ...gsap.utils.toArray(".reveal-title"),
+  ...gsap.utils.toArray("main .hero-word"),
+  ...gsap.utils.toArray("main h1"),
+  ...gsap.utils.toArray("main h2"),
+  ...gsap.utils.toArray("main h3"),
+  ...gsap.utils.toArray("main h4"),
+]);
+
+const boxRevealTargets = uniqueElements([
+  ...gsap.utils.toArray(".reveal-box"),
+  ...gsap.utils.toArray("main .deblur-on-scroll"),
+  ...gsap.utils.toArray("main article"),
+  ...gsap.utils.toArray("main #videoFrame"),
+]);
+
+const subtitleRevealTargets = uniqueElements([
+  ...gsap.utils.toArray(".reveal-subtitle"),
+  ...gsap.utils.toArray("main h1 + p"),
+  ...gsap.utils.toArray("main h2 + p"),
+  ...gsap.utils.toArray("main h3 + p"),
+  ...gsap.utils.toArray("main h4 + p"),
+  ...gsap.utils.toArray("main .prompt-panel-header p"),
+  ...gsap.utils.toArray("main .video-support-notice"),
+  ...gsap.utils.toArray("main .config-subtitle"),
+  ...gsap.utils.toArray("main #status"),
+]);
+
+if (!prefersReducedMotion) {
+  registerScrollReveal({
+    elements: titleRevealTargets,
+    startState: { y: 20 },
+    duration: 0.62,
+    ease: "power2.out",
+  });
+
+  registerScrollReveal({
+    elements: boxRevealTargets,
+    startState: { y: 20 },
+    duration: 0.68,
+    ease: "power2.out",
+  });
+
+  registerScrollReveal({
+    elements: subtitleRevealTargets,
+    startState: { x: -20 },
+    duration: 0.58,
+    ease: "power2.out",
+  });
+}
 
 el.apiHelpButton.addEventListener("click", openApiModal);
 el.closeApiModal.addEventListener("click", closeApiModal);
