@@ -1527,9 +1527,9 @@ const registerScrollReveal = ({ elements, startState, duration = 0.65, ease = "p
     const isLateTarget = element.classList.contains("reveal-late");
     const isReverseTarget = element.classList.contains("reveal-reverse");
     const isDelayedTarget = element.classList.contains("reveal-delay-last");
-    const enterStart = isDelayedTarget ? "top 90%" : isReverseTarget ? "top 85%" : isLateTarget ? "top 92%" : "top 80%";
+    const enterStart = isDelayedTarget ? "top 90%" : isReverseTarget ? "top 85%" : isLateTarget ? "top 95%" : "top 80%";
 
-    gsap.fromTo(
+    const revealTween = gsap.fromTo(
       element,
       {
         autoAlpha: 0,
@@ -1548,6 +1548,7 @@ const registerScrollReveal = ({ elements, startState, duration = 0.65, ease = "p
           start: enterStart,
           end: isReverseTarget ? "bottom 70%" : undefined,
           fastScrollEnd: true,
+          anticipatePin: isLateTarget ? 1 : 0,
           toggleActions: isReverseTarget ? "play none none reverse" : "play none none none",
         },
       },
@@ -1562,12 +1563,11 @@ const registerScrollReveal = ({ elements, startState, duration = 0.65, ease = "p
       start: "top bottom",
       end: "bottom bottom",
       fastScrollEnd: true,
+      anticipatePin: isLateTarget ? 1 : 0,
       onLeaveBack: () => {
-        gsap.set(element, {
-          autoAlpha: 0,
-          x: startState.x || 0,
-          y: startState.y || 0,
-        });
+        revealTween.invalidate();
+        revealTween.restart(true);
+        revealTween.pause(0);
       },
     });
   });
@@ -1621,6 +1621,20 @@ if (!prefersReducedMotion) {
     startState: { x: -20 },
     duration: 0.58,
     ease: "power2.out",
+  });
+
+  const refreshScrollReveal = () => {
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  };
+
+  window.addEventListener("load", refreshScrollReveal, { once: true });
+  document.querySelectorAll("img").forEach((image) => {
+    if (image.complete) {
+      return;
+    }
+
+    image.addEventListener("load", refreshScrollReveal, { once: true });
+    image.addEventListener("error", refreshScrollReveal, { once: true });
   });
 }
 
