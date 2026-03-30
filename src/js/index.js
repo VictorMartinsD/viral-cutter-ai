@@ -75,6 +75,7 @@ const app = {
   latestUploadedVideoId: null,
   newBadgeAnimationPendingId: null,
   isSuccessJumpBarVisible: false,
+  isDownloadInProgress: false,
   dialogResolver: null,
   dialogIsClosing: false,
 };
@@ -128,16 +129,18 @@ const throttle = (callback, wait = 80) => {
   };
 };
 
-const updateStatus = (message, loading = false) => {
+const updateStatus = (message, loading = false, options = {}) => {
+  const { success = false } = options;
+
   el.status.textContent = message;
-  el.status.classList.remove("status-loading", "status-success");
+  el.status.classList.remove("status-loading", "status-success", "status-error");
 
   if (loading) {
     el.status.classList.add("status-loading");
     return;
   }
 
-  if (message.toLowerCase().includes("sucesso")) {
+  if (success || message.toLowerCase().includes("sucesso")) {
     el.status.classList.add("status-success");
   }
 };
@@ -179,11 +182,15 @@ const updateVideoDownloadButtonState = () => {
   }
 
   const payload = getCurrentVideoDownloadPayload();
-  const isEnabled = Boolean(payload?.url);
+  const isEnabled = Boolean(payload?.url) && !app.isDownloadInProgress;
 
   el.videoDownloadBtn.disabled = !isEnabled;
   el.videoDownloadBtn.setAttribute("aria-disabled", String(!isEnabled));
-  el.videoDownloadBtn.title = isEnabled ? "Baixar vídeo atual" : "Carregue um vídeo para habilitar o download";
+  if (app.isDownloadInProgress) {
+    el.videoDownloadBtn.title = "Download em andamento...";
+  } else {
+    el.videoDownloadBtn.title = isEnabled ? "Baixar vídeo atual" : "Carregue um vídeo para habilitar o download";
+  }
 
   if (!isEnabled) {
     delete el.videoDownloadBtn.dataset.downloadUrl;
@@ -204,11 +211,35 @@ const triggerFileDownload = (url, fileName) => {
   anchor.remove();
 };
 
+const showDownloadRetryStatus = () => {
+  el.status.classList.remove("status-loading", "status-success");
+  el.status.classList.add("status-error");
+  el.status.textContent = "Falha ao realizar o download, ";
+
+  const retryButton = document.createElement("button");
+  retryButton.type = "button";
+  retryButton.className = "status-retry-btn";
+  retryButton.textContent = "clique aqui para tentar novamente.";
+  retryButton.addEventListener("click", () => {
+    void downloadCurrentVideo();
+  });
+
+  el.status.append(retryButton);
+};
+
 const downloadCurrentVideo = async () => {
-  const payload = getCurrentVideoDownloadPayload();
-  if (!payload) {
+  if (app.isDownloadInProgress) {
     return;
   }
+
+  const payload = getCurrentVideoDownloadPayload();
+  if (!payload) {
+    updateStatus("Carregue um vídeo para habilitar o download.", false);
+    return;
+  }
+
+  app.isDownloadInProgress = true;
+  updateVideoDownloadButtonState();
 
   try {
     const response = await fetch(payload.url);
@@ -221,8 +252,14 @@ const downloadCurrentVideo = async () => {
 
     triggerFileDownload(blobUrl, payload.fileName);
     setTimeout(() => URL.revokeObjectURL(blobUrl), 5000);
-  } catch {
-    triggerFileDownload(payload.url, payload.fileName);
+
+    updateStatus("Vídeo baixado.", false, { success: true });
+  } catch (downloadError) {
+    showDownloadRetryStatus();
+    console.log({ downloadError });
+  } finally {
+    app.isDownloadInProgress = false;
+    updateVideoDownloadButtonState();
   }
 };
 

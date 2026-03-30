@@ -113,6 +113,36 @@ html.dark #status.status-success::after {
   color: #f0fdf4;
 }
 
+#status.status-error {
+  color: #b91c1c;
+}
+
+html.dark #status.status-error {
+  color: #fda4af;
+}
+
+#status .status-retry-btn {
+  margin-left: 0.12rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#status .status-retry-btn:hover {
+  opacity: 0.82;
+}
+
+#status .status-retry-btn:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
 .success-jump-bar {
   position: fixed;
   left: 1rem;
