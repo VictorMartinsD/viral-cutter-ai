@@ -732,10 +732,6 @@ const updatePromptTitlePlaceholder = () => {
   el.promptTitleInput.placeholder = window.innerWidth < 355 ? "Ex.: Gancho forte..." : "Ex.: Gancho forte para inicio";
 };
 
-const animateButtonPress = (buttonElement) => {
-  gsap.fromTo(buttonElement, { scale: 1 }, { scale: 0.97, duration: 0.08, yoyo: true, repeat: 1, ease: "power1.out" });
-};
-
 const resolveCustomDialog = (value) => {
   if (!app.dialogResolver) {
     return;
@@ -1527,9 +1523,9 @@ const registerScrollReveal = ({ elements, startState, duration = 0.65, ease = "p
     const isLateTarget = element.classList.contains("reveal-late");
     const isReverseTarget = element.classList.contains("reveal-reverse");
     const isDelayedTarget = element.classList.contains("reveal-delay-last");
-    const enterStart = isDelayedTarget ? "top 90%" : isReverseTarget ? "top 85%" : isLateTarget ? "top 92%" : "top 80%";
+    const enterStart = isDelayedTarget ? "top 90%" : isReverseTarget ? "top 85%" : isLateTarget ? "top 95%" : "top 80%";
 
-    gsap.fromTo(
+    const revealTween = gsap.fromTo(
       element,
       {
         autoAlpha: 0,
@@ -1548,6 +1544,7 @@ const registerScrollReveal = ({ elements, startState, duration = 0.65, ease = "p
           start: enterStart,
           end: isReverseTarget ? "bottom 70%" : undefined,
           fastScrollEnd: true,
+          anticipatePin: isLateTarget ? 1 : 0,
           toggleActions: isReverseTarget ? "play none none reverse" : "play none none none",
         },
       },
@@ -1562,25 +1559,17 @@ const registerScrollReveal = ({ elements, startState, duration = 0.65, ease = "p
       start: "top bottom",
       end: "bottom bottom",
       fastScrollEnd: true,
+      anticipatePin: isLateTarget ? 1 : 0,
       onLeaveBack: () => {
-        gsap.set(element, {
-          autoAlpha: 0,
-          x: startState.x || 0,
-          y: startState.y || 0,
-        });
+        revealTween.invalidate();
+        revealTween.restart(true);
+        revealTween.pause(0);
       },
     });
   });
 };
 
-const titleRevealTargets = uniqueElements([
-  ...gsap.utils.toArray(".reveal-title"),
-  ...gsap.utils.toArray("main .hero-word"),
-  ...gsap.utils.toArray("main h1"),
-  ...gsap.utils.toArray("main h2"),
-  ...gsap.utils.toArray("main h3"),
-  ...gsap.utils.toArray("main h4"),
-]);
+const titleRevealTargets = uniqueElements([...gsap.utils.toArray(".reveal-title:not(.hero-intro-title)")]);
 
 const boxRevealTargets = uniqueElements([
   ...gsap.utils.toArray(".reveal-box"),
@@ -1590,18 +1579,85 @@ const boxRevealTargets = uniqueElements([
 ]);
 
 const subtitleRevealTargets = uniqueElements([
-  ...gsap.utils.toArray(".reveal-subtitle"),
-  ...gsap.utils.toArray("main h1 + p"),
-  ...gsap.utils.toArray("main h2 + p"),
-  ...gsap.utils.toArray("main h3 + p"),
-  ...gsap.utils.toArray("main h4 + p"),
+  ...gsap.utils.toArray(".reveal-subtitle:not(.hero-intro-subtitle)"),
   ...gsap.utils.toArray("main .prompt-panel-header p"),
   ...gsap.utils.toArray("main .video-support-notice"),
   ...gsap.utils.toArray("main .config-subtitle"),
   ...gsap.utils.toArray("main #status"),
 ]);
 
+const setupHeroIntroTimeline = () => {
+  const heroTitle = document.querySelector(".hero-intro-title");
+  const heroSubtitle = document.querySelector(".hero-intro-subtitle");
+  const heroCtas = gsap.utils.toArray(".hero-intro-cta");
+  if (!heroTitle || !heroSubtitle || !heroCtas.length) {
+    return;
+  }
+
+  gsap.set([heroTitle, heroSubtitle, ...heroCtas], {
+    autoAlpha: 0,
+    y: 20,
+  });
+
+  gsap
+    .timeline({ defaults: { duration: 0.88, ease: "power2.out" } })
+    .to(heroTitle, {
+      autoAlpha: 1,
+      y: 0,
+      overwrite: "auto",
+    })
+    .to(
+      heroSubtitle,
+      {
+        autoAlpha: 1,
+        y: 0,
+        overwrite: "auto",
+      },
+      "-=0.46",
+    )
+    .to(
+      heroCtas,
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.34,
+        ease: "power3.out",
+        overwrite: "auto",
+      },
+      "-=0.72",
+    )
+    .add(() => {
+      heroCtas.forEach((cta) => {
+        gsap.fromTo(
+          cta,
+          {
+            autoAlpha: 0,
+            y: 20,
+          },
+          {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.46,
+            ease: "power3.out",
+            overwrite: "auto",
+            scrollTrigger: {
+              trigger: cta,
+              start: "top 85%",
+              end: "bottom 70%",
+              fastScrollEnd: true,
+              toggleActions: "play none none reverse",
+            },
+          },
+        );
+      });
+
+      ScrollTrigger.refresh();
+    });
+};
+
 if (!prefersReducedMotion) {
+  setupHeroIntroTimeline();
+
   registerScrollReveal({
     elements: titleRevealTargets,
     startState: { y: 20 },
@@ -1621,6 +1677,20 @@ if (!prefersReducedMotion) {
     startState: { x: -20 },
     duration: 0.58,
     ease: "power2.out",
+  });
+
+  const refreshScrollReveal = () => {
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+  };
+
+  window.addEventListener("load", refreshScrollReveal, { once: true });
+  document.querySelectorAll("img").forEach((image) => {
+    if (image.complete) {
+      return;
+    }
+
+    image.addEventListener("load", refreshScrollReveal, { once: true });
+    image.addEventListener("error", refreshScrollReveal, { once: true });
   });
 }
 
