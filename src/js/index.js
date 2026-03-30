@@ -732,6 +732,10 @@ const updatePromptTitlePlaceholder = () => {
   el.promptTitleInput.placeholder = window.innerWidth < 355 ? "Ex.: Gancho forte..." : "Ex.: Gancho forte para inicio";
 };
 
+const animateButtonPress = (buttonElement) => {
+  gsap.fromTo(buttonElement, { scale: 1 }, { scale: 0.97, duration: 0.08, yoyo: true, repeat: 1, ease: "power1.out" });
+};
+
 const resolveCustomDialog = (value) => {
   if (!app.dialogResolver) {
     return;
@@ -1624,7 +1628,7 @@ const setupHeroIntroTimeline = () => {
         ease: "power3.out",
         overwrite: "auto",
       },
-      "-=0.72",
+      "-=0.62",
     )
     .add(() => {
       heroCtas.forEach((cta) => {
