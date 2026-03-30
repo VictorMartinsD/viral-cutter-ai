@@ -65,23 +65,17 @@ Diferencial técnico: prompts reutilizáveis organizados em configurações, per
   <summary><b>🧭 Clique aqui para visualizar previews por tema e resolução</b></summary>
   <br>
 
+### 🌙 Modo escuro
+
   <details>
-    <summary><b>Desktop 🖥️ - Modo escuro 🌙</b></summary>
+    <summary><b>🖥️ Desktop</b></summary>
     <br>
       <img src="https://github.com/user-attachments/assets/2833ebf7-f44d-4b25-b43d-9d5e5be7c74e" alt="Preview do Cutter.ai em modo escuro no desktop" />
     </div>
   </details>
 
   <details>
-    <summary><b>Desktop 🖥️ - Modo claro ☀️</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/53a265e7-0d8f-40a7-9f51-8c73f3142876" alt="Preview do Cutter.ai em modo claro no desktop" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Laptop - 1024px 💻 - Modo escuro 🌙</b></summary>
+    <summary><b>💻 Laptop - 1024px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/6dcf3634-ae46-4d46-8692-6f1e251f1794" alt="Preview do Cutter.ai em modo escuro no laptop 1024px" />
@@ -89,15 +83,7 @@ Diferencial técnico: prompts reutilizáveis organizados em configurações, per
   </details>
 
   <details>
-    <summary><b>Laptop - 1024px 💻 - Modo claro ☀️</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/bd095451-e286-4853-82ec-9c2f2a09ffaa" alt="Preview do Cutter.ai em modo claro no laptop 1024px" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Tablet - 768px 📱 - Modo escuro 🌙</b></summary>
+    <summary><b>📱 Tablet - 768px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/7e86505a-2b4c-448b-ac15-c75abb66a8cc" alt="Preview do Cutter.ai em modo escuro no tablet 768px" />
@@ -105,15 +91,7 @@ Diferencial técnico: prompts reutilizáveis organizados em configurações, per
   </details>
 
   <details>
-    <summary><b>Tablet - 768px 📱 - Modo claro ☀️</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/8382d18c-5eb0-4b04-829b-4d3d30d08b26" alt="Preview do Cutter.ai em modo claro no tablet 768px" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Mobile L - 425px 📲 - Modo escuro 🌙</b></summary>
+    <summary><b>📲 Mobile L - 425px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/a56c8ac9-ebb6-48e3-9123-96e1847f18df" alt="Preview do Cutter.ai em modo escuro no mobile L 425px" />
@@ -121,7 +99,43 @@ Diferencial técnico: prompts reutilizáveis organizados em configurações, per
   </details>
 
   <details>
-    <summary><b>Mobile L - 425px 📲 - Modo claro ☀️</b></summary>
+    <summary><b>📱 Mobile S - 320px</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/69b99cb8-f6d6-4ac7-b3aa-b85c50adf63c" alt="Preview do Cutter.ai em modo escuro no mobile S 320px" />
+    </div>
+  </details>
+
+---
+
+### ☀️ Modo claro
+
+  <details>
+    <summary><b>🖥️ Desktop</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/53a265e7-0d8f-40a7-9f51-8c73f3142876" alt="Preview do Cutter.ai em modo claro no desktop" />
+    </div>
+  </details>
+
+  <details>
+    <summary><b>💻 Laptop - 1024px</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/bd095451-e286-4853-82ec-9c2f2a09ffaa" alt="Preview do Cutter.ai em modo claro no laptop 1024px" />
+    </div>
+  </details>
+
+  <details>
+    <summary><b>📱 Tablet - 768px</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/8382d18c-5eb0-4b04-829b-4d3d30d08b26" alt="Preview do Cutter.ai em modo claro no tablet 768px" />
+    </div>
+  </details>
+
+  <details>
+    <summary><b>📲 Mobile L - 425px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/5734f158-624e-4460-a862-be38de5c9b44" alt="Preview do Cutter.ai em modo claro no mobile L 425px" />
@@ -129,15 +143,7 @@ Diferencial técnico: prompts reutilizáveis organizados em configurações, per
   </details>
 
   <details>
-    <summary><b>Mobile S - 320px 📱 - Modo escuro 🌙</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/69b99cb8-f6d6-4ac7-b3aa-b85c50adf63c" alt="Preview do Cutter.ai em modo escuro no mobile S 320px" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Mobile S - 320px 📱 - Modo claro ☀️</b></summary>
+    <summary><b>📱 Mobile S - 320px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/dbbb9f42-5ea3-49a7-ab39-c03b3c5e8903" alt="Preview do Cutter.ai em modo claro no mobile S 320px" />
@@ -532,8 +538,10 @@ Technical differentiator: reusable prompts organized in configurations, allowing
   <summary><b>🧭 Click here to view previews by theme and resolution</b></summary>
   <br>
 
+### 🌙 Dark mode
+
   <details>
-    <summary><b>Desktop 🖥️ - Dark mode 🌙</b></summary>
+    <summary><b>🖥️ Desktop</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/2833ebf7-f44d-4b25-b43d-9d5e5be7c74e" alt="Cutter.ai preview in dark mode on desktop" />
@@ -541,15 +549,7 @@ Technical differentiator: reusable prompts organized in configurations, allowing
   </details>
 
   <details>
-    <summary><b>Desktop 🖥️ - Light mode ☀️</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/53a265e7-0d8f-40a7-9f51-8c73f3142876" alt="Cutter.ai preview in light mode on desktop" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Laptop - 1024px 💻 - Dark mode 🌙</b></summary>
+    <summary><b>💻 Laptop - 1024px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/6dcf3634-ae46-4d46-8692-6f1e251f1794" alt="Cutter.ai preview in dark mode on 1024px laptop" />
@@ -557,15 +557,7 @@ Technical differentiator: reusable prompts organized in configurations, allowing
   </details>
 
   <details>
-    <summary><b>Laptop - 1024px 💻 - Light mode ☀️</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/bd095451-e286-4853-82ec-9c2f2a09ffaa" alt="Cutter.ai preview in light mode on 1024px laptop" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Tablet - 768px 📱 - Dark mode 🌙</b></summary>
+    <summary><b>📱 Tablet - 768px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/7e86505a-2b4c-448b-ac15-c75abb66a8cc" alt="Cutter.ai preview in dark mode on 768px tablet" />
@@ -573,15 +565,7 @@ Technical differentiator: reusable prompts organized in configurations, allowing
   </details>
 
   <details>
-    <summary><b>Tablet - 768px 📱 - Light mode ☀️</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/8382d18c-5eb0-4b04-829b-4d3d30d08b26" alt="Cutter.ai preview in light mode on 768px tablet" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Mobile L - 425px 📲 - Dark mode 🌙</b></summary>
+    <summary><b>📲 Mobile L - 425px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/a56c8ac9-ebb6-48e3-9123-96e1847f18df" alt="Cutter.ai preview in dark mode on 425px mobile L" />
@@ -589,7 +573,43 @@ Technical differentiator: reusable prompts organized in configurations, allowing
   </details>
 
   <details>
-    <summary><b>Mobile L - 425px 📲 - Light mode ☀️</b></summary>
+    <summary><b>📱 Mobile S - 320px</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/69b99cb8-f6d6-4ac7-b3aa-b85c50adf63c" alt="Cutter.ai preview in dark mode on 320px mobile S" />
+    </div>
+  </details>
+
+---
+
+### ☀️ Light mode
+
+  <details>
+    <summary><b>🖥️ Desktop</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/53a265e7-0d8f-40a7-9f51-8c73f3142876" alt="Cutter.ai preview in light mode on desktop" />
+    </div>
+  </details>
+
+  <details>
+    <summary><b>💻 Laptop - 1024px</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/bd095451-e286-4853-82ec-9c2f2a09ffaa" alt="Cutter.ai preview in light mode on 1024px laptop" />
+    </div>
+  </details>
+
+  <details>
+    <summary><b>📱 Tablet - 768px</b></summary>
+    <br>
+    <div align="center">
+      <img src="https://github.com/user-attachments/assets/8382d18c-5eb0-4b04-829b-4d3d30d08b26" alt="Cutter.ai preview in light mode on 768px tablet" />
+    </div>
+  </details>
+
+  <details>
+    <summary><b>📲 Mobile L - 425px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/5734f158-624e-4460-a862-be38de5c9b44" alt="Cutter.ai preview in light mode on 425px mobile L" />
@@ -597,15 +617,7 @@ Technical differentiator: reusable prompts organized in configurations, allowing
   </details>
 
   <details>
-    <summary><b>Mobile S - 320px 📱 - Dark mode 🌙</b></summary>
-    <br>
-    <div align="center">
-      <img src="https://github.com/user-attachments/assets/69b99cb8-f6d6-4ac7-b3aa-b85c50adf63c" alt="Cutter.ai preview in dark mode on 320px mobile S" />
-    </div>
-  </details>
-
-  <details>
-    <summary><b>Mobile S - 320px 📱 - Light mode ☀️</b></summary>
+    <summary><b>📱 Mobile S - 320px</b></summary>
     <br>
     <div align="center">
       <img src="https://github.com/user-attachments/assets/dbbb9f42-5ea3-49a7-ab39-c03b3c5e8903" alt="Cutter.ai preview in light mode on 320px mobile S" />
