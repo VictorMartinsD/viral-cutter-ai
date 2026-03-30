@@ -1548,6 +1548,22 @@ gsap.utils.toArray(".reveal").forEach((item) => {
   });
 });
 
+gsap.from(".powered-by-pill", {
+  y: 12,
+  scale: 0.985,
+  autoAlpha: 0,
+  duration: 0.56,
+  ease: "power2.out",
+  immediateRender: false,
+  scrollTrigger: {
+    trigger: ".powered-by-pill",
+    start: "top 94%",
+    fastScrollEnd: true,
+    toggleActions: "play none none none",
+    once: true,
+  },
+});
+
 let hasBenefitsHighlightPlayed = false;
 
 ScrollTrigger.create({
