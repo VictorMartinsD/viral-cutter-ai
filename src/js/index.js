@@ -1959,6 +1959,7 @@ el.button.addEventListener("click", async (e) => {
 
   updateStatus("Abrindo caixa para envio de vídeo...", true);
   setVideoFrameLoading(true);
+  scrollToVideoFrame();
   openWidget();
 });
 
