@@ -20,9 +20,18 @@ Automação inteligente para criação de cortes virais a partir de vídeos long
 
 ## Sumário | Summary
 
-| Português                                                                                                                                                                                                                                                                                                                                                                                                                                                       | English                                                                                                                                                                                                                                                                                                                                                                                                      |
-| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| - [Sobre o Projeto](#sobre-o-projeto)<br>- [Funcionalidades](#funcionalidades)<br>- [🖼️ Preview](#preview-pt)<br>- [Arquitetura e Decisões Técnicas](#arquitetura-e-decisões-técnicas)<br>- [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)<br>- [Como Rodar Localmente](#como-rodar-localmente)<br>- [Estrutura do Projeto](#estrutura-do-projeto)<br>- [Aprendizados e Crescimento](#aprendizados-e-crescimento)<br>- [README in English](#readme-en) | - [About the Project](#about-the-project)<br>- [Features](#features)<br>- [🖼️ Preview](#preview-en)<br>- [Architecture & Technical Decisions](#architecture--technical-decisions)<br>- [Technologies & Tools](#technologies--tools)<br>- [Getting Started](#getting-started)<br>- [Project Structure](#project-structure)<br>- [Learning & Growth](#learning--growth)<br>- [README em Português](#readme-pt) |
+| Português                                                           | English                                                                  |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| [Sobre o Projeto](#sobre-o-projeto)                                 | [About the Project](#about-the-project)                                  |
+| [Funcionalidades](#funcionalidades)                                 | [Features](#features)                                                    |
+| [Casos de Uso](#-casos-de-uso)                                      | [Use Cases](#-use-cases)                                                 |
+| [🖼️ Preview](#preview-pt)                                           | [🖼️ Preview](#preview-en)                                                |
+| [Arquitetura e Decisões Técnicas](#arquitetura-e-decisões-técnicas) | [Architecture & Technical Decisions](#architecture--technical-decisions) |
+| [Tecnologias e Ferramentas](#tecnologias-e-ferramentas)             | [Technologies & Tools](#technologies--tools)                             |
+| [Como Rodar Localmente](#como-rodar-localmente)                     | [Getting Started](#getting-started)                                      |
+| [Estrutura do Projeto](#estrutura-do-projeto)                       | [Project Structure](#project-structure)                                  |
+| [Limitações Conhecidas](#-limitações-conhecidas)                    | [Known Limitations](#-known-limitations)                                 |
+| [Aprendizados e Crescimento](#aprendizados-e-crescimento)           | [Learning & Growth](#learning--growth)                                   |
 
 </div>
 
@@ -54,6 +63,16 @@ Diferencial técnico: prompts reutilizáveis organizados em configurações, per
 - **Design Responsivo** — Interface adaptada para mobile (320px) até desktop (1920px)
 - **Validação de Entrada** — Limites de caracteres em todos os campos (60/120/150/2000)
 - **Segurança de API** — Campo oculto para chave Gemini com cópia segura
+
+---
+
+## 📌 Casos de Uso
+
+- **Criador de Conteúdo para Redes Sociais** — Produtores que gravam longos vídeos e precisam extrair clips para TikTok, Instagram Reels e YouTube Shorts
+- **Educador ou Instrutor** — Professores e criadores de cursos que desejam gerar clips promocionais de palestras ou aulas
+- **Produtor de Podcasts em Vídeo** — Podcasters que precisam identificar trechos mais interessantes para viralizar na web
+- **Analista de Conteúdo** — Equipes que precisam revisar entrevistas ou webinars e extrair insights mais relevantes
+- **Criador de Conteúdo Vertical** — Qualquer profissional que trabalha com conteúdo de longa duração e quer otimizar o reaproveitamento
 
 ---
 
@@ -421,6 +440,21 @@ viral-cutter-ai/
 
 ---
 
+## ⚠️ Limitações Conhecidas
+
+- Não possui persistência em banco de dados (dados salvos ficam restritos ao localStorage do navegador)
+- Não suporta múltiplos usuários simultâneos
+- Não possui autenticação ou sistema de contas
+- Transcrição depende da qualidade do áudio do vídeo
+- Não integra com redes sociais para publicação direta
+- Não possui histórico versionado de análises anteriores
+- Limite de tamanho de vídeo definido pelo plano Cloudinary contratado
+- Não há API pública para integração em terceiros
+- Análise de IA depende da qualidade e relevância do prompt fornecido
+- Tema suporta apenas modo claro e escuro
+
+---
+
 ## Aprendizados e Crescimento
 
 ### Desafios Técnicos Enfrentados
@@ -527,6 +561,16 @@ Technical differentiator: reusable prompts organized in configurations, allowing
 - **Responsive Design** — Interface optimized from mobile (320px) to desktop (1920px)
 - **Input Validation** — Character limits enforced across all fields (60/120/150/2000 chars)
 - **API Key Security** — Hidden field for Gemini key with secure copy-to-clipboard
+
+---
+
+## 📌 Use Cases
+
+- **Social Media Content Creator** — Producers recording long-form content who need clips for TikTok, Instagram Reels, and YouTube Shorts
+- **Educator or Instructor** — Teachers and course creators generating promotional clips from lectures or courses
+- **Video Podcast Producer** — Podcasters needing to identify and extract most engaging moments for web virality
+- **Content Analyst** — Teams reviewing interviews or webinars and extracting most relevant insights
+- **Vertical Content Creator** — Any professional working with long-form content seeking to optimize repurposing
 
 ---
 
@@ -892,6 +936,21 @@ viral-cutter-ai/
 
 - Branding images
 - Favicon with versioning
+
+---
+
+## ⚠️ Known Limitations
+
+- No database persistence (saved data limited to browser localStorage)
+- Does not support multiple simultaneous users
+- No authentication or account system
+- Transcription depends on video audio quality
+- No direct integration with social networks for publishing
+- No versioned history of previous analyses
+- Video size limit defined by Cloudinary plan
+- No public API for third-party integration
+- AI analysis depends on quality and relevance of user-provided prompt
+- Theme supports only light and dark modes
 
 ---
 
